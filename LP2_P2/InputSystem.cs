@@ -47,21 +47,21 @@ namespace LP2_P2
         {
             if(dir != Direction.None)
             {
-                player.PosXOld = player.PosX;
-                player.PosYOld = player.PosY;
+                player.OldPos.X = player.Pos.X;
+                player.OldPos.Y = player.Pos.Y;
                 switch (dir)
                 {
                     case Direction.Up:
-                        player.PosY = Math.Max(0, player.PosY - 1);
+                        player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
                         break;
                     case Direction.Left:
-                        player.PosX = Math.Max(0, player.PosX - 1);
+                        player.Pos.X = Math.Max(0, player.Pos.X - 1);
                         break;
                     case Direction.Down:
-                        player.PosY = Math.Min(db.YDim - 1, player.PosY + 1);
+                        player.Pos.Y = Math.Min(db.YDim - 1, player.Pos.Y + 1);
                         break;
                     case Direction.Right:
-                        player.PosX = Math.Min(db.XDim - 1, player.PosX + 1);
+                        player.Pos.X = Math.Min(db.XDim - 1, player.Pos.X + 1);
                         break;
                 }
             }

@@ -6,16 +6,16 @@ namespace LP2_P2
 {
     public class Player
     {
-        public int PosX { get; set; }
-        public int PosY { get; set; }
-        public int PosXOld { get; set; }
-        public int PosYOld { get; set; }
+        public Position Pos { get; set; }
+
+        public Position OldPos { get; set; }
+
         public char visuals { get; }
 
         public Player()
         {
-            PosX = 0;
-            PosY = 0;
+            Pos.X = 0;
+            Pos.Y = 0;
             visuals = 'P';
         }
     }

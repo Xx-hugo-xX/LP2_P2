@@ -7,6 +7,5 @@ namespace LP2_P2
     {
         int Value { get; }
         bool PickedUp { get; set; }
-
     }
 }
