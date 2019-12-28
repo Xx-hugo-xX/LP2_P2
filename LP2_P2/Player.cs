@@ -16,8 +16,9 @@ namespace LP2_P2
 
         public Player()
         {
-            Pos.X = 0;
-            Pos.Y = 0;
+            Pos = new Position(0, 0);
+            OldPos = Pos;
+
             visuals = 'P';
             Score = new Score();
         }
