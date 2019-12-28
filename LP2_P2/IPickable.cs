@@ -5,8 +5,7 @@ namespace LP2_P2
 {
     public interface IPickable
     {
-        int Value { get; }
-        bool PickedUp { get; set; }
-
+        public int ScoreVal { get; }
+        public bool isPicked { get; set; }
     }
 }
