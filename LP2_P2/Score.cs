@@ -9,18 +9,12 @@ namespace LP2_P2
         public string Name
         {
             get => Name;
-            set
-            {
-                Name = value.ToUpper();
-            }
+            set { Name = value.ToUpper(); }
         }
         public int TotalScore
         {
             get => TotalScore;
-            set
-            {
-                TotalScore += value;
-            }
+            set { TotalScore += value; }
         }
     }
 }
