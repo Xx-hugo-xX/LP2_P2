@@ -10,6 +10,8 @@ namespace LP2_P2
 
         public Position OldPos { get; set; }
 
+        public Score Score { get; }
+
         public char visuals { get; }
 
         public Player()
@@ -17,6 +19,7 @@ namespace LP2_P2
             Pos.X = 0;
             Pos.Y = 0;
             visuals = 'P';
+            Score = new Score();
         }
     }
 }
