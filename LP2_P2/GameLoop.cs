@@ -46,8 +46,8 @@ namespace LP2_P2
 
         public void Render()
         {
-            db[player.PosXOld, player.PosYOld] = ' ';
-            db[player.PosX, player.PosY] = player.visuals;
+            db[player.OldPos.X, player.OldPos.Y] = ' ';
+            db[player.Pos.X, player.Pos.Y] = player.visuals;
             db.Swap();
 
             for (int y = 0; y < db.YDim; y++)
