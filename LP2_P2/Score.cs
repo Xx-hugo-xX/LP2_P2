@@ -32,7 +32,7 @@ namespace LP2_P2
 
         public int CompareTo(Score otherScore)
         {
-            return TotalScore.CompareTo(otherScore.TotalScore);
+            return - TotalScore.CompareTo(otherScore.TotalScore);
         }
     }
 }
