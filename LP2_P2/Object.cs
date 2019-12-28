@@ -14,7 +14,7 @@ namespace LP2_P2
         public int[] BoxCollider;
         // Creates a Position for storing the current position
         public Position Pos { get; set; }
-        // Creates a Position for storing the players previous position
+        // Creates a Position for storing a moving object's previous position
         public Position OldPos { get; set; }
         // What character should the Object be displayed as
         public char Visuals { get; protected set; }

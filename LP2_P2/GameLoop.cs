@@ -13,6 +13,7 @@ namespace LP2_P2
         private bool running;
 
         private readonly List<Object> physicsObjects = new List<Object>();
+        private readonly Physics col;
         private readonly char[,] mapVisuals = new char[28, 23];
         private readonly string mapBuilder =
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO" +
@@ -32,7 +33,7 @@ namespace LP2_P2
         "OOOOOO.OO OOOOOOO OO.OOOOOO" +
         "O............O............O" +
         "O.OOOO.OOOOO.O.OOOOO.OOOO.O" +
-        "O...OO...............OO...O" +
+        "O...OO....... .......OO...O" +
         "OOO.OO.OO.OOOOOOO.OO.OO.OOO" +
         "O......OO....O....OO......O" +
         "O.OOOOOOOOOO.O.OOOOOOOOOO.O" +
@@ -46,7 +47,7 @@ namespace LP2_P2
             physicsObjects.Add(player);
             ConvertMapToDoubleArray();
             GenerateMap();
-
+            col = new Physics(physicsObjects);
 
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem(player, db, physicsObjects);
@@ -57,7 +58,7 @@ namespace LP2_P2
 
         public void Loop()
         {
-            int msPerUpdate = 300000;
+            int msPerUpdate = 800000;
             long previous = Math.Abs(DateTime.Now.Ticks);
             long lag = 0L;
 
@@ -72,11 +73,78 @@ namespace LP2_P2
                 inputSys.ProcessInput();
                 while (lag >= msPerUpdate)
                 {
-                    inputSys.Update();
+                    Update(mapVisuals);
                     lag -= msPerUpdate;
                 }
                 Render();
             }
+        }
+
+        public void Update(char[,] mapVisuals)
+        {
+            if (inputSys.Dir != Direction.None)
+            {
+                player.OldPos = player.Pos;
+                //player.OldPos.X = player.Pos.X;
+                //player.OldPos.Y = player.Pos.Y;
+                switch (inputSys.Dir)
+                {
+                    case Direction.Up:
+                        // Checks if the next position up is not a wall
+                        if (col.Collision(player, 0, -1) != typeof(MapPiece))
+                            // Decreases the y of the player by 1
+                            player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
+                        break;
+
+                    case Direction.Left:
+                        // Checks if the next position left is not a wall
+                        if (col.Collision(player, -1, 0) != typeof(MapPiece))
+                            // Decreases the x of the player by 1
+                            player.Pos.X = Math.Max(0, player.Pos.X - 1);
+                        break;
+
+                    case Direction.Down:
+                        // Checks if the next position down is not a wall
+                        if (col.Collision(player, 0, 1) != typeof(MapPiece))
+                            // Increases the y of the player by 1
+                            player.Pos.Y = Math.Min(db.YDim - 1, player.Pos.Y + 1);
+                        break;
+
+                    case Direction.Right:
+                        // Checks if the next position right is not a wall
+                        if (col.Collision(player, 1, 0) != typeof(MapPiece))
+                            // Increases the X of the player by 1
+                            player.Pos.X = Math.Min(db.XDim - 1, player.Pos.X + 1);
+                        break;
+                }
+            }
+            // Updates the collider of the player to his current position
+            player.UpdatePhysics();
+
+            // Checks if the player is on a Pellet
+            if (col.Collision(player) == typeof(TempPellet))
+            {
+                // Checks all the physicsObjects
+                for (int i = 0; i < physicsObjects.Count; i++)
+                {
+                    // If the object has the same postition has the player
+                    if (physicsObjects[i].Pos == player.Pos)
+                    {
+                        // Removes that object from the list
+                        physicsObjects.RemoveAt(i);
+                    }
+                }
+            }
+            // Checks if the player is on a Teleporter
+            if (col.Collision(player) == typeof(Teleporter))
+            {
+                // If his postition is 0 teleports him to 26 else teleports him
+                // to 1
+                player.Pos.X = player.Pos.X == 0 ? 26 : 1;
+            }
+            // Updates visual for position player was in if there was a
+            // a pickable on it
+            mapVisuals[player.OldPos.X, player.OldPos.Y] = ' ';
         }
 
         public void Render()
