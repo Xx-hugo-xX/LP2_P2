@@ -6,10 +6,10 @@ namespace LP2_P2
 {
     class InputSystem
     {
-        public Direction Dir { get => dir; }
+        public Direction Dir { get; private set; }
+        public Direction LastDir { get; set; }
 
         private BlockingCollection<ConsoleKey> inputCol;
-        private Direction dir;
         private Player player;
         private DoubleBuffer2D<char> db;
         private List<Object> physicsObjects;
@@ -25,8 +25,14 @@ namespace LP2_P2
             col = new Physics(physicsObjects);
 
             inputCol = new BlockingCollection<ConsoleKey>();
-            dir = new Direction();
+            Dir = new Direction();
+            LastDir = new Direction();
 
+        }
+
+        public void SetDirection(Direction dir)
+        {
+            Dir = dir;
         }
 
         public void ProcessInput()
@@ -37,19 +43,20 @@ namespace LP2_P2
                 switch (key)
                 {
                     case ConsoleKey.W:
-                        dir = Direction.Up;
+                        Dir = Direction.Up;
                         break;
                     case ConsoleKey.S:
-                        dir = Direction.Down;
+                        Dir = Direction.Down;
                         break;
                     case ConsoleKey.A:
-                        dir = Direction.Left;
+                        Dir = Direction.Left;
                         break;
                     case ConsoleKey.D:
-                        dir = Direction.Right;
+                        Dir = Direction.Right;
                         break;
                 }
             }
+            else Dir = LastDir;
         }
 
         public void ReadKeys()
