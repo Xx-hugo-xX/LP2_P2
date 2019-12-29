@@ -4,23 +4,14 @@ using System.Text;
 
 namespace LP2_P2
 {
-    public class Player
+    class Player : Object
     {
-        public Position Pos { get; set; }
-
-        public Position OldPos { get; set; }
-
-        public Score Score { get; }
-
-        public char visuals { get; }
-
         public Player()
         {
-            Pos = new Position(0, 0);
-            OldPos = Pos;
-
-            visuals = 'P';
-            Score = new Score();
+            Pos = new Position(13, 18);
+            OldPos = new Position(1, 1);
+            Visuals = 'P';
+            BoxCollider = new int[4] { 0, 0, 0 + 1, 0 + 1 };
         }
     }
 }

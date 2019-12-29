@@ -1,23 +1,38 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace LP2_P2
 {
-    public class InputSystem
+    class InputSystem
     {
-        public Direction Dir { get => dir; }
+        public Direction Dir { get; private set; }
+        public Direction LastDir { get; set; }
 
         private BlockingCollection<ConsoleKey> inputCol;
-        private Direction dir;
         private Player player;
         private DoubleBuffer2D<char> db;
+        private List<Object> physicsObjects;
+        private readonly Physics col;
 
-        public InputSystem(Player player, DoubleBuffer2D<char> db)
+        public InputSystem(Player player, DoubleBuffer2D<char> db,
+            List<Object> objects)
         {
-            inputCol = new BlockingCollection<ConsoleKey>();
-            dir = new Direction();
             this.player = player;
             this.db = db;
+
+            physicsObjects = objects;
+            col = new Physics(physicsObjects);
+
+            inputCol = new BlockingCollection<ConsoleKey>();
+            Dir = new Direction();
+            LastDir = new Direction();
+
+        }
+
+        public void SetDirection(Direction dir)
+        {
+            Dir = dir;
         }
 
         public void ProcessInput()
@@ -28,43 +43,20 @@ namespace LP2_P2
                 switch (key)
                 {
                     case ConsoleKey.W:
-                        dir = Direction.Up;
+                        Dir = Direction.Up;
                         break;
                     case ConsoleKey.S:
-                        dir = Direction.Down;
+                        Dir = Direction.Down;
                         break;
                     case ConsoleKey.A:
-                        dir = Direction.Left;
+                        Dir = Direction.Left;
                         break;
                     case ConsoleKey.D:
-                        dir = Direction.Right;
+                        Dir = Direction.Right;
                         break;
                 }
             }
-        }
-
-        public void Update()
-        {
-            if(dir != Direction.None)
-            {
-                player.OldPos.X = player.Pos.X;
-                player.OldPos.Y = player.Pos.Y;
-                switch (dir)
-                {
-                    case Direction.Up:
-                        player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
-                        break;
-                    case Direction.Left:
-                        player.Pos.X = Math.Max(0, player.Pos.X - 1);
-                        break;
-                    case Direction.Down:
-                        player.Pos.Y = Math.Min(db.YDim - 1, player.Pos.Y + 1);
-                        break;
-                    case Direction.Right:
-                        player.Pos.X = Math.Min(db.XDim - 1, player.Pos.X + 1);
-                        break;
-                }
-            }
+            else Dir = LastDir;
         }
 
         public void ReadKeys()

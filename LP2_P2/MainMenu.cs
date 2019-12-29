@@ -21,11 +21,10 @@ namespace LP2_P2
             do
             {
                 Console.Clear();
-                Console.WriteLine("1. Play" +
-                "\n2. High Scores" +
-                "\nQ. Quit");
-
-                key = Console.ReadKey().Key;
+                Console.WriteLine("1. Play\n" +
+                    "2. High Scores\n" +
+                    "Q. Quit");
+                key = Console.ReadKey(true).Key;
                 switch (key)
                 {
                     case ConsoleKey.D1:
@@ -39,7 +38,6 @@ namespace LP2_P2
                         break;
                 }
             } while (key != ConsoleKey.Q);
-
         }
 
         private void ShowHighScores()
@@ -68,7 +66,6 @@ namespace LP2_P2
         {
             Console.Clear();
             Console.WriteLine("Thank you for playing! Come back any time!");
-            Environment.Exit(0);
         }
     }
 }

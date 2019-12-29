@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LP2_P2
 {
-    public class DoubleBuffer2D<T>
+    class DoubleBuffer2D<T>
     {
         private T[,] current;
         private T[,] next;
