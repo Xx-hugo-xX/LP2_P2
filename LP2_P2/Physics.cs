@@ -33,10 +33,10 @@ namespace LP2_P2
                 {
                     // Checks if the next X and Y values are inside any
                     // collider of all the Objects
-                    if (col.BoxCollider[0] + (x) >= colliders[i].BoxCollider[0]
-                        && col.BoxCollider[2] + (x) <= colliders[i].BoxCollider[2] &&
-                        col.BoxCollider[1] + (y) >= colliders[i].BoxCollider[1]
-                        && col.BoxCollider[3] + (y) <= colliders[i].BoxCollider[3])
+                    if (col.boxCollider[0] + (x) >= colliders[i].boxCollider[0]
+                        && col.boxCollider[2] + (x) <= colliders[i].boxCollider[2] &&
+                        col.boxCollider[1] + (y) >= colliders[i].boxCollider[1]
+                        && col.boxCollider[3] + (y) <= colliders[i].boxCollider[3])
                     {
                         // If it is inside retruns the type of that Object
                         return colliders[i].GetType();
@@ -55,10 +55,10 @@ namespace LP2_P2
         //        for (int i = 1; i < colliders.Count -1; i++)
         //        {
         //            if (i != b &&
-        //                colliders[b].BoxCollider[0] ==
-        //                colliders[i].BoxCollider[0] &&
-        //                colliders[b].BoxCollider[1] ==
-        //                colliders[i].BoxCollider[1])
+        //                colliders[b].boxCollider[0] ==
+        //                colliders[i].boxCollider[0] &&
+        //                colliders[b].boxCollider[1] ==
+        //                colliders[i].boxCollider[1])
         //                return true;
         //        }
         //    }
