@@ -19,7 +19,7 @@ namespace LP2_P2
         private readonly string mapBuilder =
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO" +
         "O............O............O" +
-        "O.OOOO.OOOOO.O.OOOOO.OOOO.O" +
+        "O-OOOO.OOOOO.O.OOOOO.OOOO-O" +
         "O.........................O" +
         "O.OOOO.OO.OOOOOOO.OO.OOOO.O" +
         "O......OO....O....OO......O" +
@@ -34,7 +34,7 @@ namespace LP2_P2
         "OOOOOO.OO OOOOOOO OO.OOOOOO" +
         "O............O............O" +
         "O.OOOO.OOOOO.O.OOOOO.OOOO.O" +
-        "O...OO....... .......OO...O" +
+        "O-..OO....... .......OO..-O" +
         "OOO.OO.OO.OOOOOOO.OO.OO.OOO" +
         "O......OO....O....OO......O" +
         "O.OOOOOOOOOO.O.OOOOOOOOOO.O" +
@@ -127,7 +127,8 @@ namespace LP2_P2
             player.UpdatePhysics();
 
             // Checks if the player is on a Pellet
-            if (col.Collision(player) == typeof(SmallPellet))
+            if (col.Collision(player) == typeof(SmallPellet) ||
+                col.Collision(player) == typeof(BigPellet))
             {
                 // Checks all the physicsObjects
                 for (int i = 0; i < physicsObjects.Count; i++)
@@ -221,6 +222,12 @@ namespace LP2_P2
                     {
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new SmallPellet(x, y));
+                    }
+                    // If the current char is a . creates a Pellet
+                    if (mapVisuals[x, y] == '-')
+                    {
+                        // Creates and adds that Object to the list
+                        physicsObjects.Add(new BigPellet(x, y));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')
