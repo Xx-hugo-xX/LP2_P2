@@ -11,8 +11,8 @@ namespace LP2_P2
             Console.WindowWidth = WindowWidth * 2;
             Console.WindowHeight = WindowHeight;
 
-            GameLoop game = new GameLoop();
-            game.Loop();
+            MainMenu mainMenu = new MainMenu();
+            mainMenu.RunMenu();
         }
     }
 }
