@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace LP2_P2
 {
-    class GameLoop
+    public class GameLoop
     {
         private Player player;
         private DoubleBuffer2D<char> db;
@@ -127,7 +127,7 @@ namespace LP2_P2
             player.UpdatePhysics();
 
             // Checks if the player is on a Pellet
-            if (col.Collision(player) == typeof(TempPellet))
+            if (col.Collision(player) == typeof(SmallPellet))
             {
                 // Checks all the physicsObjects
                 for (int i = 0; i < physicsObjects.Count; i++)
@@ -216,7 +216,7 @@ namespace LP2_P2
                     if (mapVisuals[x, y] == '.')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new TempPellet(x, y));
+                        physicsObjects.Add(new SmallPellet(x, y));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')

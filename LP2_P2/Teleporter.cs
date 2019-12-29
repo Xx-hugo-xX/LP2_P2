@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LP2_P2
 {
-    class Teleporter : Object
+    public class Teleporter : Object
     {
         public Teleporter(int x, int y)
         {

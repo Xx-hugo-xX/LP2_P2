@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LP2_P2
 {
-    class Player : Object
+    public class Player : Object
     {
         public Player()
         {

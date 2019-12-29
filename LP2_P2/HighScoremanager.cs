@@ -8,7 +8,7 @@ namespace LP2_P2
     /// Manages the file that contains the High Scores, adding and removing
     /// Scores from the list, and saving them on the file when prompted
     /// </summary>
-    class HighScoreManager
+    public class HighScoreManager
     {
         // Declares the readonly string that will store the directory name
         private readonly string appName;

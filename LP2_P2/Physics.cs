@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LP2_P2
 {
-    class Physics
+    public class Physics
     {
         // Creates a list of all the objects in game
         private readonly List<Object> colliders;

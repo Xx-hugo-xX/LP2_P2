@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace LP2_P2
 {
-    class InputSystem
+    public class InputSystem
     {
         public Direction Dir { get; private set; }
         public Direction LastDir { get; set; }

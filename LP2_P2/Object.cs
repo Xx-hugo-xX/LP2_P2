@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LP2_P2
 {
@@ -8,7 +6,7 @@ namespace LP2_P2
     /// Creates a new Object with the necessery thing to be used by Physics
     /// and the program in general.
     /// </summary>
-    class Object
+    public class Object
     {
         // Stores 4 cordinates for the colider
         public int[] BoxCollider;
