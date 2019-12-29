@@ -137,7 +137,7 @@ namespace LP2_P2
                         physicsObjects[i].Pos.Y == player.Pos.Y)
                     {
                         // Add picked up item's score value to player's score
-                        player.plyrScore.AddScore(10);
+                        player.plyrScore.AddScore(physicsObjects[i].ScoreVal);
                         // Removes that object from the list
                         physicsObjects.RemoveAt(i);
                         // Updates visual for position player was in if there was a

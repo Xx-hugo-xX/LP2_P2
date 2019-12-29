@@ -4,11 +4,11 @@ using System.Text;
 
 namespace LP2_P2
 {
-    public class SmallPellet : Object, IPickable
+    public class SmallPellet : Object
     {
         private const int scoreVal = 10;
 
-        public int ScoreVal => scoreVal;
+        public override int ScoreVal => scoreVal;
 
         public SmallPellet(int x, int y)
         {

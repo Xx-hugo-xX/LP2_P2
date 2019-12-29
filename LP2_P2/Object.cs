@@ -6,7 +6,7 @@ namespace LP2_P2
     /// Creates a new Object with the necessery thing to be used by Physics
     /// and the program in general.
     /// </summary>
-    public class Object
+    public class Object : IPickable
     {
         // Stores 4 cordinates for the colider
         public int[] BoxCollider;
@@ -16,6 +16,8 @@ namespace LP2_P2
         public Position OldPos { get; set; }
         // What character should the Object be displayed as
         public char Visuals { get; protected set; }
+
+        public virtual int ScoreVal { get; }
 
         // Updates the collider cordinates to match the current position
         public void UpdatePhysics()
