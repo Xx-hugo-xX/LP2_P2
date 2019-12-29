@@ -10,7 +10,7 @@ namespace LP2_P2
         {
             Pos = new Position(x, y);
             Visuals = '.';
-            BoxCollider = new int[4] { x, y, l, w };
+            boxCollider = new int[4] { x, y, l, w };
         }
     }
 }
