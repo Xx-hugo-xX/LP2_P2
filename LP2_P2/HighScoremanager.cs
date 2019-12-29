@@ -180,14 +180,14 @@ namespace LP2_P2
         public void SaveHighScores()
         {
             // Uses StreamWriter to write on the High Scores file
-            using (StreamWriter sw = new StreamWriter(fileNameFull))
+            using StreamWriter sw = new StreamWriter(fileNameFull);
 
-                // Loops through each element of the "highScores" list
-                foreach (Score hs in highScores)
+            // Loops through each element of the "highScores" list
+            foreach (Score hs in highScores)
 
-                    // Writes the Names and TotalScores of each element
-                    // of the "highScores" list on the High Scores File
-                    sw.WriteLine(hs.Name + "\t" + hs.TotalScore);
+                // Writes the Names and TotalScores of each element
+                // of the "highScores" list on the High Scores File
+                sw.WriteLine(hs.Name + "\t" + hs.TotalScore);
         }
     }
 }

@@ -5,19 +5,19 @@ namespace LP2_P2
 {
     public class MainMenu
     {
-        GameLoop game;
-        HighScoreManager highScoreManager;
+        GameLoop Game { get; }
+        HighScoreManager HighScoreManager { get; }
 
         public MainMenu()
         {
-            game = new GameLoop();
-            highScoreManager = new HighScoreManager();
-            highScoreManager.CreateFile();
+            Game = new GameLoop();
+            HighScoreManager = new HighScoreManager();
+            HighScoreManager.CreateFile();
         }
 
         public void RunMenu()
         {
-            ConsoleKey key = ConsoleKey.D0;
+            ConsoleKey key;
             do
             {
                 Console.Clear();
@@ -29,7 +29,7 @@ namespace LP2_P2
                 switch (key)
                 {
                     case ConsoleKey.D1:
-                        game.Loop();
+                        Game.Loop();
                         break;
                     case ConsoleKey.D2:
                         ShowHighScores();
@@ -44,7 +44,7 @@ namespace LP2_P2
 
         private void ShowHighScores()
         {
-            using StreamReader sr = new StreamReader(highScoreManager.fileNameFull);
+            using StreamReader sr = new StreamReader(HighScoreManager.fileNameFull);
 
             string s;
             char separator = '\t';
