@@ -58,25 +58,17 @@ namespace LP2_P2
 
         public void Loop()
         {
-            int msPerUpdate = 800000;
-            long previous = Math.Abs(DateTime.Now.Ticks);
-            long lag = 0L;
-
             running = true;
             while (running)
             {
-                long current = Math.Abs(DateTime.Now.Ticks);
-                long elapsed = current - previous;
-                previous = current;
-                lag += elapsed;
-
+                long start = DateTime.Now.Ticks;
                 inputSys.ProcessInput();
-                while (lag >= msPerUpdate)
-                {
-                    Update(mapVisuals);
-                    lag -= msPerUpdate;
-                }
+                Update(mapVisuals);
                 Render();
+                Thread.Sleep(Math.Abs(
+                    (int)(start / 20000)
+                    + 20
+                    - (int)(DateTime.Now.Ticks / 20000)));
             }
         }
 
@@ -85,8 +77,6 @@ namespace LP2_P2
             if (inputSys.Dir != Direction.None)
             {
                 player.OldPos = player.Pos;
-                //player.OldPos.X = player.Pos.X;
-                //player.OldPos.Y = player.Pos.Y;
                 switch (inputSys.Dir)
                 {
                     case Direction.Up:
@@ -114,7 +104,8 @@ namespace LP2_P2
                         if (col.Collision(player, 0, 1) != typeof(MapPiece))
                         {
                             // Increases the y of the player by 1
-                            player.Pos.Y = Math.Min(db.YDim - 1, player.Pos.Y + 1);
+                            player.Pos.Y =
+                                Math.Min(db.YDim - 1, player.Pos.Y + 1);
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
@@ -124,7 +115,8 @@ namespace LP2_P2
                         if (col.Collision(player, 1, 0) != typeof(MapPiece))
                         {
                             // Increases the X of the player by 1
-                            player.Pos.X = Math.Min(db.XDim - 1, player.Pos.X + 1);
+                            player.Pos.X =
+                                Math.Min(db.XDim - 1, player.Pos.X + 1);
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
@@ -184,17 +176,17 @@ namespace LP2_P2
             {
                 for (int x = 0; x < db.XDim; x++)
                 {
-                    //if (db[x, y] == 'O')
-                    //{
-                    //    Console.BackgroundColor = ConsoleColor.DarkBlue;
-                    //    Console.ForegroundColor = ConsoleColor.DarkBlue;
-                    //}
-                    //if (db[x, y] == 'c' || db[x, y] == 'o')
-                    //{
-                    //    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    //}
+                    if (db[x, y] == 'O')
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkBlue;
+                        Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    }
+                    if (db[x, y] == 'c' || db[x, y] == 'o')
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    }
                     Console.Write(db[x, y]);
-                    //Console.ResetColor();
+                    Console.ResetColor();
                 }
                 Console.WriteLine();
             }
