@@ -125,7 +125,7 @@ namespace LP2_P2
                 // Checks if the Score does not have a name associated
                 if (score.Name == default)
                 {
-                    // Asks user to input his/her name
+                    // Asks user to input their name
                     Console.WriteLine("New High Score!" +
                         "What should we call you?\n");
 
