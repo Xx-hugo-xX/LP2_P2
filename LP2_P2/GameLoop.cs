@@ -11,6 +11,7 @@ namespace LP2_P2
         private DoubleBuffer2D<char> db;
         private InputSystem inputSys;
         private bool running;
+        private Thread keyReader;
 
         private readonly List<Object> physicsObjects = new List<Object>();
         private readonly Physics col;
@@ -41,7 +42,6 @@ namespace LP2_P2
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO";
         public GameLoop()
         {
-
             player = new Player();
 
             physicsObjects.Add(player);
@@ -51,13 +51,13 @@ namespace LP2_P2
 
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem(player, db, physicsObjects);
-            Thread keyReader = new Thread(inputSys.ReadKeys);
-            keyReader.Start();
+            keyReader = new Thread(inputSys.ReadKeys);
             Console.CursorVisible = false;
         }
 
         public void Loop()
         {
+            keyReader.Start();
             running = true;
             while (running)
             {
