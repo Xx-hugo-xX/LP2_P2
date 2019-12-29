@@ -34,5 +34,7 @@ namespace LP2_P2
         {
             return - TotalScore.CompareTo(otherScore.TotalScore);
         }
+
+        public override string ToString() => $"Score: {TotalScore}";
     }
 }
