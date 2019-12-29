@@ -4,9 +4,13 @@ using System.Text;
 
 namespace LP2_P2
 {
-    public class Teleporter : Object
+    public class SmallPellet : Object
     {
-        public Teleporter(int x, int y)
+        private const int scoreVal = 10;
+
+        public override int ScoreVal => scoreVal;
+
+        public SmallPellet(int x, int y)
         {
             Pos = new Position(x, y);
             Visuals = '.';

@@ -4,12 +4,16 @@ using System.Text;
 
 namespace LP2_P2
 {
-    class TempPellet : Object
+    class BigPellet : Object
     {
-        public TempPellet(int x, int y)
+        private const int scoreVal = 50;
+
+        public override int ScoreVal => scoreVal;
+
+        public BigPellet(int x, int y)
         {
             Pos = new Position(x, y);
-            Visuals = '.';
+            Visuals = 'o';
             BoxCollider = new int[4] { x, y, x + 1, y + 1 };
         }
     }

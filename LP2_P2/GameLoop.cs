@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace LP2_P2
 {
-    class GameLoop
+    public class GameLoop
     {
         private Player player;
         private DoubleBuffer2D<char> db;
@@ -19,7 +19,7 @@ namespace LP2_P2
         private readonly string mapBuilder =
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO" +
         "O............O............O" +
-        "O.OOOO.OOOOO.O.OOOOO.OOOO.O" +
+        "O-OOOO.OOOOO.O.OOOOO.OOOO-O" +
         "O.........................O" +
         "O.OOOO.OO.OOOOOOO.OO.OOOO.O" +
         "O......OO....O....OO......O" +
@@ -34,7 +34,7 @@ namespace LP2_P2
         "OOOOOO.OO OOOOOOO OO.OOOOOO" +
         "O............O............O" +
         "O.OOOO.OOOOO.O.OOOOO.OOOO.O" +
-        "O...OO....... .......OO...O" +
+        "O-..OO....... .......OO..-O" +
         "OOO.OO.OO.OOOOOOO.OO.OO.OOO" +
         "O......OO....O....OO......O" +
         "O.OOOOOOOOOO.O.OOOOOOOOOO.O" +
@@ -127,21 +127,25 @@ namespace LP2_P2
             player.UpdatePhysics();
 
             // Checks if the player is on a Pellet
-            if (col.Collision(player) == typeof(TempPellet))
+            if (col.Collision(player) == typeof(SmallPellet) ||
+                col.Collision(player) == typeof(BigPellet))
             {
                 // Checks all the physicsObjects
                 for (int i = 0; i < physicsObjects.Count; i++)
                 {
                     // If the object has the same postition has the player
-                    if (physicsObjects[i].Pos == player.Pos)
+                    if (physicsObjects[i].Pos.X == player.Pos.X &&
+                        physicsObjects[i].Pos.Y == player.Pos.Y)
                     {
+                        // Add picked up item's score value to player's score
+                        player.plyrScore.AddScore(physicsObjects[i].ScoreVal);
                         // Removes that object from the list
                         physicsObjects.RemoveAt(i);
+                        // Updates visual for position player was in if there was a
+                        // a pickable on it
+                        mapVisuals[player.OldPos.X, player.OldPos.Y] = ' ';
                     }
                 }
-                // Updates visual for position player was in if there was a
-                // a pickable on it
-                mapVisuals[player.OldPos.X, player.OldPos.Y] = ' ';
             }
             // Checks if the player is on a Teleporter
             if (col.Collision(player) == typeof(Teleporter))
@@ -154,6 +158,7 @@ namespace LP2_P2
 
         public void Render()
         {
+            Console.WriteLine(player.plyrScore);
             // Loop for the amount of chars in the second position of the array
             for (int y = 0; y < 23; y++)
             {
@@ -216,7 +221,13 @@ namespace LP2_P2
                     if (mapVisuals[x, y] == '.')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new TempPellet(x, y));
+                        physicsObjects.Add(new SmallPellet(x, y));
+                    }
+                    // If the current char is a . creates a Pellet
+                    if (mapVisuals[x, y] == '-')
+                    {
+                        // Creates and adds that Object to the list
+                        physicsObjects.Add(new BigPellet(x, y));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')

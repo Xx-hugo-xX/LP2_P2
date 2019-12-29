@@ -9,7 +9,7 @@ namespace LP2_P2
     /// clearing the next frame to be written again.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    class DoubleBuffer2D<T>
+    public class DoubleBuffer2D<T>
     {
         // Stores the current frame in a generic type bidimensional array
         private T[,] current;
