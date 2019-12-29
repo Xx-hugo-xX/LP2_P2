@@ -18,33 +18,26 @@ namespace LP2_P2
         public void RunMenu()
         {
             ConsoleKey key;
-            bool menuRunning = true;
-
-            while (menuRunning)
+            do
             {
                 Console.Clear();
-                Console.WriteLine("1. Play" +
-                "\n2. High Scores" +
-                "\nQ. Quit");
-
-                while((key = Console.ReadKey(true).Key) != ConsoleKey.Q)
+                Console.WriteLine("1. Play\n" +
+                    "2. High Scores\n" +
+                    "Q. Quit");
+                key = Console.ReadKey(true).Key;
+                switch (key)
                 {
-                    switch (key)
-                    {
-                        case ConsoleKey.D1:
-                            game.Loop();
-                            break;
-                        case ConsoleKey.D2:
-                            ShowHighScores();
-                            break;
-                        case ConsoleKey.Q:
-                            Quit();
-                            menuRunning = false;
-                            break;
-                    }
+                    case ConsoleKey.D1:
+                        game.Loop();
+                        break;
+                    case ConsoleKey.D2:
+                        ShowHighScores();
+                        break;
+                    case ConsoleKey.Q:
+                        Quit();
+                        break;
                 }
-            }
-
+            } while (key != ConsoleKey.Q);
         }
 
         private void ShowHighScores()
