@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace LP2_P2
+﻿namespace LP2_P2
 {
     public interface IPickable
     {

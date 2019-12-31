@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LP2_P2
+﻿namespace LP2_P2
 {
     /// <summary>
     /// Creates a new Object with the necessery thing to be used by Physics
