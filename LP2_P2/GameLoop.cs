@@ -72,10 +72,10 @@ namespace LP2_P2
                 inputSys.ProcessInput();
                 Update(mapVisuals);
                 Render();
-                Thread.Sleep(Math.Abs(
-                    (int)(start / 20000)
-                    + 20
-                    - (int)(DateTime.Now.Ticks / 20000)));
+                //Thread.Sleep(Math.Abs(
+                //    (int)(start / 20000)
+                //    + 20
+                //    - (int)(DateTime.Now.Ticks / 20000)));
             }
         }
 
@@ -91,6 +91,9 @@ namespace LP2_P2
                     {
                         if (counter < pathRed.Count)
                         {
+                            redGhost.OldPos.X = redGhost.Pos.X;
+                            redGhost.OldPos.Y = redGhost.Pos.Y;
+
                             redGhost.Pos.X = pathRed[counter].X;
                             redGhost.Pos.Y = pathRed[counter].Y;
 

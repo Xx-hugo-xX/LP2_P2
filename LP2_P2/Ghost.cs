@@ -10,10 +10,12 @@ namespace LP2_P2
         private readonly List<Object> closed = new List<Object>();
         private readonly List<Object> neibors = new List<Object>();
         private readonly List<Object> allPieces = new List<Object>();
+
         public Ghost(int x, int y, List<Object> allMapPieces)
         {
 
             Pos = new Position(x, y);
+            OldPos = new Position(x - 1, y);
             Visuals = 'U';
             BoxCollider = new int[4] { x, y, x + 1, y + 1 };
             allPieces = allMapPieces;
@@ -62,18 +64,18 @@ namespace LP2_P2
                         allPieces[c].Pos.Y == current.Pos.Y - 1
                         && allPieces[c].Pos.X == current.Pos.X)
                     {
-                        if (current.parent != allPieces[c] && 
-                            allPieces[c].GetType() != typeof(Player))
+                        if (allPieces[c].GetType() != typeof(Player) &&
+                            allPieces[c].GetType() != typeof(MapPiece) &&
+                            !(allPieces[c].Pos.X == OldPos.X && allPieces[c].Pos.Y == OldPos.Y))
                         {
-                            neibors.Add(allPieces[c]);
+                                neibors.Add(allPieces[c]);
                         }
                     }
                 }
 
                 for (int b = 0; b < neibors.Count; b++)
                 {
-                    if (neibors[b].GetType() == typeof(MapPiece)
-                        || closed.Contains(neibors[b]))
+                    if (closed.Contains(neibors[b]))
                     {
                         continue;
                     }
