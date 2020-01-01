@@ -12,6 +12,12 @@ namespace LP2_P2
         private bool running;
         private Thread keyReader;
 
+        // private readonly EmptySpace redCorner = new EmptySpace(25, 1);
+        private readonly Ghost redGhost;
+        private List<Position> pathRed = new List<Position>();
+        private int counter = 0;
+        private int timer = 0;
+
         private readonly List<Object> physicsObjects = new List<Object>();
         private readonly Physics col;
         private readonly char[,] mapVisuals = new char[28, 23];
@@ -48,6 +54,8 @@ namespace LP2_P2
             GenerateMap();
             col = new Physics(physicsObjects);
 
+            redGhost = new Ghost(2, 1, physicsObjects);
+
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem(player, db, physicsObjects);
             keyReader = new Thread(inputSys.ReadKeys);
@@ -75,6 +83,25 @@ namespace LP2_P2
         {
             if (inputSys.Dir != Direction.None)
             {
+                timer++;
+                if (timer > 1)
+                {
+                    timer = 0;
+                    if (pathRed != null)
+                    {
+                        if (counter < pathRed.Count)
+                        {
+                            redGhost.Pos.X = pathRed[counter].X;
+                            redGhost.Pos.Y = pathRed[counter].Y;
+
+                            counter++;
+                        }
+                        else
+                        {
+                            counter = 0;
+                        }
+                    }
+                }
                 player.OldPos = player.Pos;
                 switch (inputSys.Dir)
                 {
@@ -120,10 +147,14 @@ namespace LP2_P2
                         }
                         break;
                 }
+                pathRed = redGhost.CalcuatePath(player);
+                counter = 0;
             }
 
             // Updates the collider of the player to his current position
             player.UpdatePhysics();
+            // Updates the collider of the redGhost to his current position
+            redGhost.UpdatePhysics();
 
             // Checks if the player is on a Pellet
             if (col.Collision(player) == typeof(SmallPellet) ||
@@ -133,16 +164,18 @@ namespace LP2_P2
                 for (int i = 0; i < physicsObjects.Count; i++)
                 {
                     // If the object has the same postition has the player
-                    if (physicsObjects[i].Pos.X == player.Pos.X &&
-                        physicsObjects[i].Pos.Y == player.Pos.Y)
+                    if (physicsObjects[i] != player
+                        && physicsObjects[i].Pos.X == player.Pos.X
+                        && physicsObjects[i].Pos.Y == player.Pos.Y)
                     {
                         // Add picked up item's score value to player's score
                         player.plyrScore.AddScore(physicsObjects[i].ScoreVal);
                         // Removes that object from the list
-                        physicsObjects.RemoveAt(i);
+                        physicsObjects[i] = new EmptySpace(player.OldPos.X, player.OldPos.Y);
                         // Updates visual for position player was in if there was a
                         // a pickable on it
                         mapVisuals[player.OldPos.X, player.OldPos.Y] = ' ';
+
                     }
                 }
             }
@@ -171,6 +204,7 @@ namespace LP2_P2
 
             // Puts the player position on the buffer
             db[player.Pos.X, player.Pos.Y] = player.Visuals;
+            db[redGhost.Pos.X, redGhost.Pos.Y] = redGhost.Visuals;
 
             db.Swap();
 
@@ -180,7 +214,7 @@ namespace LP2_P2
             {
                 for (int x = 0; x < db.XDim; x++)
                 {
-                    if (db[x, y] == 'O')
+                    if (db[x, y] == 'O')                                    // <------------------------------
                     {
                         Console.BackgroundColor = ConsoleColor.DarkBlue;
                         Console.ForegroundColor = ConsoleColor.DarkBlue;
@@ -188,9 +222,9 @@ namespace LP2_P2
                     if (db[x, y] == 'c' || db[x, y] == 'o')
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    }
+                    }                                                       // <-------------------------------
                     Console.Write(db[x, y]);
-                    Console.ResetColor();
+                    Console.ResetColor();                                   // <-------------------------------
                 }
                 Console.WriteLine();
             }
@@ -233,6 +267,10 @@ namespace LP2_P2
                     {
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new Teleporter(x, y));
+                    }
+                    if (mapVisuals[x, y] == ' ')
+                    {
+                        physicsObjects.Add(new EmptySpace(x, y));
                     }
                 }
             }

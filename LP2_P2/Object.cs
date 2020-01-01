@@ -14,7 +14,14 @@
         public Position OldPos { get; set; }
         // What character should the Object be displayed as
         public char Visuals { get; protected set; }
-
+        // Distance from the star position
+        public int distanceCost = 0;
+        // Distance from the current to the end position
+        public int closenessCost = 0;
+        // Combination of the two costs
+        public int combinedCost => distanceCost + closenessCost;
+        // The Object found before this one
+        public Object parent;
         public virtual int ScoreVal { get; }
 
         // Updates the collider cordinates to match the current position
