@@ -47,8 +47,7 @@ namespace LP2_P2
                 open.Remove(current);
                 closed.Add(current);
 
-                if (current.Pos.X == target.Pos.X &&
-                    current.Pos.Y == target.Pos.Y)
+                if (current.Pos == target.Pos)
                 {
                     return TracePath(current);
                 }
@@ -66,7 +65,7 @@ namespace LP2_P2
                     {
                         if (allPieces[c].GetType() != typeof(Player) &&
                             allPieces[c].GetType() != typeof(MapPiece) &&
-                            !(allPieces[c].Pos.X == OldPos.X && allPieces[c].Pos.Y == OldPos.Y))
+                            !(allPieces[c].Pos == OldPos))
                         {
                                 neibors.Add(allPieces[c]);
                         }

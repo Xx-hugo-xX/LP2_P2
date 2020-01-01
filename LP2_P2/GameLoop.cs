@@ -12,7 +12,6 @@ namespace LP2_P2
         private bool running;
         private Thread keyReader;
 
-        // private readonly EmptySpace redCorner = new EmptySpace(25, 1);
         private readonly Ghost redGhost;
         private List<Position> pathRed = new List<Position>();
         private int counter = 0;
@@ -84,27 +83,24 @@ namespace LP2_P2
             if (inputSys.Dir != Direction.None)
             {
                 timer++;
-                if (timer > 1)
+
+                if (pathRed != null || timer > 1)
                 {
                     timer = 0;
-                    if (pathRed != null)
+                    if (counter < pathRed.Count)
                     {
-                        if (counter < pathRed.Count)
-                        {
-                            redGhost.OldPos.X = redGhost.Pos.X;
-                            redGhost.OldPos.Y = redGhost.Pos.Y;
+                        redGhost.OldPos.X = redGhost.Pos.X;
+                        redGhost.OldPos.Y = redGhost.Pos.Y;
 
-                            redGhost.Pos.X = pathRed[counter].X;
-                            redGhost.Pos.Y = pathRed[counter].Y;
+                        redGhost.Pos.X = pathRed[counter].X;
+                        redGhost.Pos.Y = pathRed[counter].Y;
 
-                            counter++;
-                        }
-                        else
-                        {
-                            counter = 0;
-                        }
+                        counter++;
                     }
+                    else
+                        counter = 0;
                 }
+
                 player.OldPos = player.Pos;
                 switch (inputSys.Dir)
                 {
@@ -168,8 +164,7 @@ namespace LP2_P2
                 {
                     // If the object has the same postition has the player
                     if (physicsObjects[i] != player
-                        && physicsObjects[i].Pos.X == player.Pos.X
-                        && physicsObjects[i].Pos.Y == player.Pos.Y)
+                        && physicsObjects[i].Pos == player.Pos)
                     {
                         // Add picked up item's score value to player's score
                         player.plyrScore.AddScore(physicsObjects[i].ScoreVal);

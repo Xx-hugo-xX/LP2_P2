@@ -1,4 +1,6 @@
-﻿namespace LP2_P2
+﻿using System;
+
+namespace LP2_P2
 {
     public class Position
     {
@@ -9,6 +11,15 @@
         {
             X = x;
             Y = y;
+        }
+
+        public static bool operator ==(Position A, Position B)
+        {
+            return A.X == B.X && A.Y == B.Y;
+        }
+        public static bool operator !=(Position A, Position B)
+        {
+            return A.X != B.X && A.Y != B.Y;
         }
     }
 }
