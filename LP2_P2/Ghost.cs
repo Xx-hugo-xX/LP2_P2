@@ -18,8 +18,8 @@ namespace LP2_P2
         private readonly List<Object> allPieces = new List<Object>();
         // Creates the corner the ghosts should go to when in scatter or 
         // frighten mode
-        private readonly EmptySpace corner;
-        private readonly EmptySpace center = new EmptySpace(13, 7);
+        public readonly EmptySpace corner;
+        public readonly EmptySpace center = new EmptySpace(13, 7);
         // Stores the state the ghosts are currently in
         public GhostState state;
         // Creates a variable of the type random
