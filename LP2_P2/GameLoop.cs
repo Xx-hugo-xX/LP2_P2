@@ -32,7 +32,7 @@ namespace LP2_P2
         "     O.OO         OO.O     " +
         "OOOOOO.OO         OO.OOOOOO" +
         "T     .             .     T" +
-        "OOOOOO.OO         OO.OOOOOO" +
+        "OOOOOO.OO    B    OO.OOOOOO" +
         "     O.OO         OO.O     " +
         "     O.OO         OO.O     " +
         "OOOOOO.OO OOOOOOO OO.OOOOOO" +
@@ -157,7 +157,8 @@ namespace LP2_P2
 
             // Checks if the player is on a Pellet
             if (col.Collision(player) == typeof(SmallPellet) ||
-                col.Collision(player) == typeof(BigPellet))
+                col.Collision(player) == typeof(BigPellet) ||
+                col.Collision(player) == typeof(BonusFruit))
             {
                 // Checks all the physicsObjects
                 for (int i = 0; i < physicsObjects.Count; i++)
@@ -255,11 +256,17 @@ namespace LP2_P2
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new SmallPellet(x, y));
                     }
-                    // If the current char is a . creates a Pellet
+                    // If the current char is a - creates a BigPellet
                     if (mapVisuals[x, y] == '-')
                     {
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new BigPellet(x, y));
+                    }
+                    // If the current char is a B creates a BonusFruit
+                    if (mapVisuals[x, y] == 'B')
+                    {
+                        // Creates and adds that Object to the list
+                        physicsObjects.Add(new BonusFruit(x, y, 100));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')
