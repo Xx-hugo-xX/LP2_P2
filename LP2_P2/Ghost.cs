@@ -16,6 +16,14 @@ namespace LP2_P2
         private readonly List<Object> neighbors = new List<Object>();
         // Creates a List to store all the Objects on the board
         private readonly List<Object> allPieces = new List<Object>();
+        // Creates the corner the ghosts should go to when in scatter or 
+        // frighten mode
+        private readonly EmptySpace corner;
+        private readonly EmptySpace center = new EmptySpace(13, 7);
+        // Stores the state the ghosts are currently in
+        public GhostState state;
+        // Creates a variable of the type random
+        private Random rnd = new Random();
 
         /// <summary>
         /// Constructor of the class Ghost
@@ -23,7 +31,8 @@ namespace LP2_P2
         /// <param name="x"> The wanted X position </param>
         /// <param name="y"> the wanted Y position </param>
         /// <param name="allMapPieces"> The List of all Physics Objects</param>
-        public Ghost(int x, int y, List<Object> allMapPieces)
+        public Ghost(int x, int y, List<Object> allMapPieces,
+            int cornerX, int cornerY)
         {
             // Creates a new Position vector and assigns it the x and y value
             Pos = new Position(x, y);
@@ -35,6 +44,10 @@ namespace LP2_P2
             BoxCollider = new int[4] { x, y, x + 1, y + 1 };
             // Assigns this Object list the one passed as argument 
             allPieces = allMapPieces;
+            // Assigns the ghost state to chase mode
+            state = GhostState.chase;
+            // Assigns the ghost it's respective corner
+            corner = new EmptySpace(cornerX, cornerY);
         }
 
         /// <summary>
@@ -44,6 +57,25 @@ namespace LP2_P2
         /// <returns> A list of Position for the ghost to follow </returns>
         public List<Position> CalcuatePath(Object target)
         {
+            if (state == GhostState.scatter)
+                target = corner;
+
+            if (state == GhostState.frightened)
+            {
+                while (target.GetType() == typeof(Player) ||
+                    target.GetType() == typeof(MapPiece)) 
+                {
+                    target = allPieces[rnd.Next(0, allPieces.Count)];
+                } 
+            }
+            if (state == GhostState.eaten)
+            {
+                if (Pos == center.Pos)
+                    state = GhostState.chase;
+                else
+                    target = center;
+            }
+
             // Clears the list to make sure they're empty before starting to
             // use them
             open.Clear();

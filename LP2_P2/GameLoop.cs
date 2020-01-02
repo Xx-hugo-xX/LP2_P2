@@ -53,7 +53,7 @@ namespace LP2_P2
             GenerateMap();
             col = new Physics(physicsObjects);
 
-            redGhost = new Ghost(2, 1, physicsObjects);
+            redGhost = new Ghost(2, 1, physicsObjects, 1, 1);
 
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem(player, db, physicsObjects);
@@ -84,7 +84,7 @@ namespace LP2_P2
             {
                 timer++;
 
-                if (pathRed != null && timer > 0)
+                if (pathRed != null && timer > 1)
                 {
                     timer = 0;
                     if (counter < pathRed.Count)
@@ -166,6 +166,8 @@ namespace LP2_P2
                     if (physicsObjects[i] != player
                         && physicsObjects[i].Pos == player.Pos)
                     {
+                        if (col.Collision(player) == typeof(BigPellet))
+                            redGhost.state = GhostState.frightened;
                         // Add picked up item's score value to player's score
                         player.plyrScore.AddScore(physicsObjects[i].ScoreVal);
                         // Removes that object from the list
@@ -173,7 +175,6 @@ namespace LP2_P2
                         // Updates visual for position player was in if there was a
                         // a pickable on it
                         mapVisuals[player.OldPos.X, player.OldPos.Y] = ' ';
-
                     }
                 }
             }
