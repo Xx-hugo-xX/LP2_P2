@@ -138,7 +138,7 @@ namespace LP2_P2
                     {
                         // Local variable combining the distance to the start and
                         // the distance between the current position and that
-                        // neibhour
+                        // neibhor
                         int newCostMov = current.distanceCost +
                             GetDistace(current.Pos, neighbors[b].Pos);
 
@@ -147,9 +147,9 @@ namespace LP2_P2
                         if (newCostMov < neighbors[b].distanceCost
                             || !open.Contains(neighbors[b]))
                         {
-                            // Sets a new distance cost to that neighbour
+                            // Sets a new distance cost to that neighbor
                             neighbors[b].distanceCost = newCostMov;
-                            // Sets a new closeness to that neighbour
+                            // Sets a new closeness to that neighbor
                             neighbors[b].closenessCost =
                                 GetDistace(neighbors[b].Pos, target.Pos);
                             // Sets the parent of that neighbor the current object
@@ -159,25 +159,48 @@ namespace LP2_P2
                         }
                     }
                 }
+                // Clears the list of neighbors
                 neighbors.Clear();
             }
+            // If it fails to return a path returns null
             return null;
         }
+        /// <summary>
+        /// Forms a list of positions by getting the positions of the parents
+        /// of the Object until the Object is the start position
+        /// </summary>
+        /// <param name="end"> The Object it targets </param>
+        /// <returns> A list of all the positions of the defined path</returns>
         private List<Position> TracePath(Object end)
         {
+            // Creates a list of positions to store the path
             List<Position> path = new List<Position>();
+            // Creates a local Object variable and assigns it the passed Object
             Object currentPiece = end;
 
+            // Runs the loop until the currentPiece is not the start
             while (currentPiece != this)
             {
+                // Adds the position of the currentPiece to the list
                 path.Add(currentPiece.Pos);
+                // Assigns the currentPiece the parent of that piece
                 currentPiece = currentPiece.parent;
             }
+            // The path forms from end to start, so it needs to be reversed
             path.Reverse();
+            // Returns the list
             return path;
         }
-        private int GetDistace(Position A, Position B) => (int)Math.Sqrt
-            (Math.Pow(Math.Abs(A.X - B.X), 2) +
+        /// <summary>
+        /// A simple method for calculating distances
+        /// </summary>
+        /// <param name="A"> The first position </param>
+        /// <param name="B"> The Second position </param>
+        /// <returns> An Integer with the aprox distance between the two
+        /// </returns>
+        private int GetDistace(Position A, Position B) => 
+            // Distance formula (square root of ((x-x^2) + (y-y^2))) 
+            (int)Math.Sqrt(Math.Pow(Math.Abs(A.X - B.X), 2) +
              Math.Pow(Math.Abs(A.Y - B.Y), 2));
     }
 }

@@ -84,7 +84,7 @@ namespace LP2_P2
             {
                 timer++;
 
-                if (pathRed != null && timer > 1)
+                if (pathRed != null && timer > 0)
                 {
                     timer = 0;
                     if (counter < pathRed.Count)
