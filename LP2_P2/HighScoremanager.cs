@@ -46,7 +46,7 @@ namespace LP2_P2
                 Directory.CreateDirectory(filePath);
 
             // Sets the name of the file where the High Scores will be saved
-            fileName = "HighScores";
+            fileName = "HighScores.txt";
 
             // Combines the path and the name of the file in one single string
             fileNameFull = Path.Combine(filePath, fileName);
@@ -144,6 +144,13 @@ namespace LP2_P2
 
                 // Sorts the "highScores" list
                 highScores.Sort();
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Your score isn't an High Score." +
+                    "Better luck next time!");
+                Console.ReadKey(true);
             }
         }
 
