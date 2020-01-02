@@ -17,6 +17,7 @@ namespace LP2_P2
         private int counter = 0;
         private int timer = 0;
         private int stateSwapTimer = 0;
+        private int level;
 
         private readonly List<Object> physicsObjects = new List<Object>();
         private readonly Physics col;
@@ -47,6 +48,7 @@ namespace LP2_P2
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO";
         public GameLoop()
         {
+            level = 1;
             player = new Player();
 
             physicsObjects.Add(player);
@@ -83,6 +85,16 @@ namespace LP2_P2
 
         public void Update(char[,] mapVisuals)
         {
+            // Clears physicsObjects list and generates the map again, while
+            // keeping player's score and incrementing the level number
+            // TO DO: RESET PLAYER AND GHOST POSITION (AND GHOST BEHAVIOUR)
+            if (!physicsObjects.Exists(obj => obj.GetType() == typeof(SmallPellet)))
+            {
+                physicsObjects.Clear();
+                ConvertMapToDoubleArray();
+                GenerateMap();
+                level++;
+            }
             if (inputSys.Dir != Direction.None)
             {
                 Object wallDetection;
@@ -191,7 +203,7 @@ namespace LP2_P2
 
         public void Render()
         {
-            Console.WriteLine(player.plyrScore);
+            Console.WriteLine($"{player.plyrScore}\t\tLevel: {level}");
             // Loop for the amount of chars in the second position of the array
             for (int y = 0; y < 23; y++)
             {
