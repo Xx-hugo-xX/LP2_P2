@@ -16,6 +16,7 @@ namespace LP2_P2
         private List<Position> pathRed = new List<Position>();
         private int counter = 0;
         private int timer = 0;
+        private int stateSwapTimer = 0;
 
         private readonly List<Object> physicsObjects = new List<Object>();
         private readonly Physics col;
@@ -51,9 +52,11 @@ namespace LP2_P2
             physicsObjects.Add(player);
             ConvertMapToDoubleArray();
             GenerateMap();
-            col = new Physics(physicsObjects);
 
             redGhost = new Ghost(2, 1, physicsObjects, 1, 1);
+            physicsObjects.Add(redGhost);
+
+            col = new Physics(physicsObjects);
 
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem(player, db, physicsObjects);
@@ -82,31 +85,13 @@ namespace LP2_P2
         {
             if (inputSys.Dir != Direction.None)
             {
-                timer++;
-
-                if (pathRed != null && timer > 1)
-                {
-                    timer = 0;
-                    if (counter < pathRed.Count)
-                    {
-                        redGhost.OldPos.X = redGhost.Pos.X;
-                        redGhost.OldPos.Y = redGhost.Pos.Y;
-
-                        redGhost.Pos.X = pathRed[counter].X;
-                        redGhost.Pos.Y = pathRed[counter].Y;
-
-                        counter++;
-                    }
-                    else
-                        counter = 0;
-                }
-
-                player.OldPos = player.Pos;
+                Object wallDetection;
                 switch (inputSys.Dir)
                 {
                     case Direction.Up:
+                        wallDetection = col.Collision(player, 0, -1);
                         // Checks if the next position up is not a wall
-                        if (col.Collision(player, 0, -1) != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.GetType() != typeof(MapPiece))
                         {
                             // Decreases the y of the player by 1
                             player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
@@ -115,8 +100,9 @@ namespace LP2_P2
                         break;
 
                     case Direction.Left:
+                        wallDetection = col.Collision(player, -1, 0);
                         // Checks if the next position left is not a wall
-                        if (col.Collision(player, -1, 0) != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.GetType() != typeof(MapPiece))
                         {
                             // Decreases the x of the player by 1
                             player.Pos.X = Math.Max(0, player.Pos.X - 1);
@@ -125,8 +111,9 @@ namespace LP2_P2
                         break;
 
                     case Direction.Down:
+                        wallDetection = col.Collision(player, 0, 1);
                         // Checks if the next position down is not a wall
-                        if (col.Collision(player, 0, 1) != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.GetType() != typeof(MapPiece))
                         {
                             // Increases the y of the player by 1
                             player.Pos.Y =
@@ -136,8 +123,9 @@ namespace LP2_P2
                         break;
 
                     case Direction.Right:
+                        wallDetection = col.Collision(player, 1, 0);
                         // Checks if the next position right is not a wall
-                        if (col.Collision(player, 1, 0) != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.GetType() != typeof(MapPiece))
                         {
                             // Increases the X of the player by 1
                             player.Pos.X =
@@ -146,6 +134,12 @@ namespace LP2_P2
                         }
                         break;
                 }
+
+                stateSwapTimer++;
+                timer++;
+
+                UpdateGhost(redGhost);
+
                 pathRed = redGhost.CalcuatePath(player);
                 counter = 0;
             }
@@ -155,36 +149,43 @@ namespace LP2_P2
             // Updates the collider of the redGhost to his current position
             redGhost.UpdatePhysics();
 
-            // Checks if the player is on a Pellet
-            if (col.Collision(player) == typeof(SmallPellet) ||
-                col.Collision(player) == typeof(BigPellet) ||
-                col.Collision(player) == typeof(BonusFruit))
+            Object obj = col.Collision(player);
+
+            if (obj != null)
             {
-                // Checks all the physicsObjects
-                for (int i = 0; i < physicsObjects.Count; i++)
+                if (obj.GetType() == typeof(Ghost))
                 {
-                    // If the object has the same postition has the player
-                    if (physicsObjects[i] != player
-                        && physicsObjects[i].Pos == player.Pos)
-                    {
-                        if (col.Collision(player) == typeof(BigPellet))
-                            redGhost.state = GhostState.frightened;
-                        // Add picked up item's score value to player's score
-                        player.plyrScore.AddScore(physicsObjects[i].ScoreVal);
-                        // Removes that object from the list
-                        physicsObjects[i] = new EmptySpace(player.OldPos.X, player.OldPos.Y);
-                        // Updates visual for position player was in if there was a
-                        // a pickable on it
-                        mapVisuals[player.OldPos.X, player.OldPos.Y] = ' ';
-                    }
+                    Ghost ghost = obj as Ghost;
+                    if (ghost.state == GhostState.frightened)
+                        ghost.state = GhostState.eaten;
                 }
-            }
-            // Checks if the player is on a Teleporter
-            if (col.Collision(player) == typeof(Teleporter))
-            {
-                // If his postition is 0 teleports him to 26 else teleports him
-                // to 1
-                player.Pos.X = player.Pos.X == 0 ? 26 : 1;
+
+                // Checks if the player is on a Pellet
+                if (obj.GetType() == typeof(SmallPellet) ||
+                    obj.GetType() == typeof(BigPellet) ||
+                    obj.GetType() == typeof(BonusFruit))
+                {
+                    if (obj.GetType() == typeof(BigPellet))
+                        redGhost.state = GhostState.frightened;
+                    // Add picked up item's score value to player's score
+                    player.plyrScore.AddScore(obj.ScoreVal);
+
+                    if (physicsObjects.Contains(obj))
+                        physicsObjects[physicsObjects.IndexOf(obj)] = new EmptySpace(player.OldPos.X, player.OldPos.Y);
+                    // Updates visual for position player was in if there was a
+                    // a pickable on it
+                    mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
+
+
+                }
+
+                // Checks if the player is on a Teleporter
+                if (obj.GetType() == typeof(Teleporter))
+                {
+                    // If his postition is 0 teleports him to 26 else teleports him
+                    // to 1
+                    player.Pos.X = player.Pos.X == 0 ? 26 : 1;
+                }
             }
         }
 
@@ -205,6 +206,10 @@ namespace LP2_P2
             // Puts the player position on the buffer
             db[player.Pos.X, player.Pos.Y] = player.Visuals;
             db[redGhost.Pos.X, redGhost.Pos.Y] = redGhost.Visuals;
+
+            // --- RedGhost debug ---
+            //db[redGhost.center.Pos.X, redGhost.center.Pos.Y] = '+';
+            //db[redGhost.corner.Pos.X, redGhost.corner.Pos.Y] = '?';
 
             db.Swap();
 
@@ -303,6 +308,37 @@ namespace LP2_P2
                     // Adds 1 to charcount to acess the next char on the string
                     charcount++;
                 }
+            }
+        }
+
+        private void UpdateGhost(Ghost ghost)
+        {
+            if (stateSwapTimer >= 20 && ghost.state == GhostState.chase)
+            {
+                ghost.state = GhostState.scatter;
+                stateSwapTimer = 0;
+            }
+            if (stateSwapTimer >= 7 && ghost.state == GhostState.scatter)
+            {
+                ghost.state = GhostState.chase;
+                stateSwapTimer = 0;
+            }
+
+            if (pathRed != null && timer > 1)
+            {
+                timer = 0;
+                if (counter < pathRed.Count)
+                {
+                    ghost.OldPos.X = ghost.Pos.X;
+                    ghost.OldPos.Y = ghost.Pos.Y;
+
+                    ghost.Pos.X = pathRed[counter].X;
+                    ghost.Pos.Y = pathRed[counter].Y;
+
+                    counter++;
+                }
+                else
+                    counter = 0;
             }
         }
     }

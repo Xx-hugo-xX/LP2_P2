@@ -22,13 +22,13 @@ namespace LP2_P2
         /// <param name="x"> The X value it wants to check </param>
         /// <param name="y"> The Y value it wants to check</param>
         /// <returns> The type of the object it collided </returns>
-        public Type Collision(Object col, int x = 0, int y = 0)
+        public Object Collision(Object col, int x = 0, int y = 0)
         {
             // Runs the loop acording to how many Objects there are
             for (int i = 0; i < colliders.Count; i++)
             {
                 // Checks if the Object being checked is not itself
-                if (colliders[i].GetType() != col.GetType())
+                if (colliders[i].GetType() != col.GetType() && colliders[i].GetType() != typeof(EmptySpace))
                 {
                     // Checks if the next X and Y values are inside any
                     // collider of all the Objects
@@ -38,7 +38,7 @@ namespace LP2_P2
                         && col.BoxCollider[3] + (y) <= colliders[i].BoxCollider[3])
                     {
                         // If it is inside retruns the type of that Object
-                        return colliders[i].GetType();
+                        return colliders[i];
                     }
                 }
             }
