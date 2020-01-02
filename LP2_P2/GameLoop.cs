@@ -173,7 +173,7 @@ namespace LP2_P2
                         physicsObjects[physicsObjects.IndexOf(obj)] = new EmptySpace(player.OldPos.X, player.OldPos.Y);
                     // Updates visual for position player was in if there was a
                     // a pickable on it
-                    mapVisuals[player.OldPos.X, player.OldPos.Y] = ' ';
+                    mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
 
 
                 }
