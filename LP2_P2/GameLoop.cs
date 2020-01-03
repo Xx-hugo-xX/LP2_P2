@@ -14,8 +14,12 @@ namespace LP2_P2
 
         private readonly Ghost redGhost;
         private readonly Ghost pinkGhost;
+        private readonly Ghost orangeGhost;
+        private readonly Ghost blueGhost;
 
         private readonly EmptySpace pinkTarget = new EmptySpace(0, 0);
+        private readonly EmptySpace orangeTarget = new EmptySpace(0, 0);
+        private readonly EmptySpace blueTarget = new EmptySpace(0,0);
 
         private bool updateTimer = false;
         private int timer = 0;
@@ -23,7 +27,7 @@ namespace LP2_P2
 
         private readonly List<Object> physicsObjects = new List<Object>();
         private readonly Physics col;
-        private readonly char[,] mapVisuals = new char[28, 23];
+        private readonly char[,] mapVisuals = new char[27, 23];
 
         private readonly string mapBuilder =
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO" +
@@ -34,7 +38,7 @@ namespace LP2_P2
         "O......OO....O....OO......O" +
         "OOOOOO.OOOOO.O.OOOOO.OOOOOO" +
         "     O.OO         OO.O     " +
-        "     O.OO OOOOOOO OO.O     " +
+        "     O.OO OOO OOO OO.O     " +
         "OOOOOO.OO O     O OO.OOOOOO" +
         "T     .   O     O   .     T" +
         "OOOOOO.OO O     O OO.OOOOOO" +
@@ -58,10 +62,15 @@ namespace LP2_P2
             ConvertMapToDoubleArray();
             GenerateMap();
 
-            redGhost = new Ghost(2, 1, physicsObjects, 1, 1);
-            pinkGhost = new Ghost(24, 1, physicsObjects, 25, 1);
+            redGhost = new Ghost(12, 11, physicsObjects, 1, 1);
+            pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1);
+            orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21);
+            blueGhost = new Ghost(15, 11, physicsObjects, 25, 21);
+
             physicsObjects.Add(redGhost);
             physicsObjects.Add(pinkGhost);
+            physicsObjects.Add(orangeGhost);
+            physicsObjects.Add(blueGhost);
 
             col = new Physics(physicsObjects);
 
@@ -81,10 +90,10 @@ namespace LP2_P2
                 inputSys.ProcessInput();
                 Update(mapVisuals);
                 Render();
-                Thread.Sleep(Math.Abs(
-                    (int)(start / 20000)
-                    + 20
-                    - (int)(DateTime.Now.Ticks / 20000)));
+                //Thread.Sleep(Math.Abs(
+                //    (int)(start / 20000)
+                //    + 20
+                //    - (int)(DateTime.Now.Ticks / 20000)));
             }
         }
 
@@ -101,7 +110,7 @@ namespace LP2_P2
                     case Direction.Up:
                         wallDetection = col.Collision(player, 0, -1);
                         // Checks if the next position up is not a wall
-                        if (wallDetection == null || wallDetection.GetType() 
+                        if (wallDetection == null || wallDetection.GetType()
                             != typeof(MapPiece))
                         {
                             // Decreases the y of the player by 1
@@ -113,7 +122,7 @@ namespace LP2_P2
                     case Direction.Left:
                         wallDetection = col.Collision(player, -1, 0);
                         // Checks if the next position left is not a wall
-                        if (wallDetection == null || wallDetection.GetType() 
+                        if (wallDetection == null || wallDetection.GetType()
                             != typeof(MapPiece))
                         {
                             // Decreases the x of the player by 1
@@ -149,36 +158,8 @@ namespace LP2_P2
                         break;
                 }
 
-                stateSwapTimer++;
-                timer++;
-
-                UpdateGhost(redGhost);
-                UpdateGhost(pinkGhost);
-
-                if (updateTimer)
-                {
-                    stateSwapTimer = 0;
-                    updateTimer = false;
-                }
-
-                if (timer > 1)
-                {
-                    if (!(player.OldPos == player.Pos) 
-                        || pinkGhost.Pos == pinkTarget.Pos)
-                        pinkTarget.Pos = new Position(
-                            ((player.Pos.X - player.OldPos.X) * 3) 
-                            + player.Pos.X, 
-                            ((player.Pos.Y - player.OldPos.Y) * 3)
-                            + player.Pos.Y);
-
-                    pinkGhost.CalcuatePath(pinkTarget);
-                    redGhost.CalcuatePath(player);
-
-                    redGhost.UpdatePosition();
-                    pinkGhost.UpdatePosition();
-                }
-                Console.WriteLine(pinkGhost.state);
-                Console.WriteLine(redGhost.state);
+                UpdateGhostBehaviour();
+                
             }
 
             // Updates the collider of the player to his current position
@@ -228,10 +209,10 @@ namespace LP2_P2
         {
             Console.WriteLine(player.plyrScore);
             // Loop for the amount of chars in the second position of the array
-            for (int y = 0; y < 23; y++)
+            for (int y = 0; y < mapVisuals.GetLength(1); y++)
             {
                 // Loop for the amount of chars in the first position of the array
-                for (int x = 0; x < 28; x++)
+                for (int x = 0; x < mapVisuals.GetLength(0); x++)
                 {
                     // Assigns the corresponding visual to the buffer
                     db[x, y] = mapVisuals[x, y];
@@ -242,6 +223,8 @@ namespace LP2_P2
             db[player.Pos.X, player.Pos.Y] = player.Visuals;
             db[redGhost.Pos.X, redGhost.Pos.Y] = redGhost.Visuals;
             db[pinkGhost.Pos.X, pinkGhost.Pos.Y] = 'G';
+            db[orangeGhost.Pos.X, orangeGhost.Pos.Y] = 'L';
+            db[blueGhost.Pos.X, blueGhost.Pos.Y] = 'B';
 
             db.Swap();
 
@@ -276,10 +259,10 @@ namespace LP2_P2
         private void GenerateMap()
         {
             // Loop for the amount of lines in the char array
-            for (int y = 0; y < 23; y++)
+            for (int y = 0; y < mapVisuals.GetLength(1); y++)
             {
                 // Loop for the amount of characters in the char array
-                for (int x = 0; x < 28; x++)
+                for (int x = 0; x < mapVisuals.GetLength(0); x++)
                 {
                     // If the current char is a O creates a wall
                     if (mapVisuals[x, y] == 'O')
@@ -337,7 +320,7 @@ namespace LP2_P2
             }
         }
 
-        private void UpdateGhost(Ghost ghost)
+        private void UpdateGhostState(Ghost ghost)
         {
             if (stateSwapTimer >= 20 && ghost.state == GhostState.chase)
             {
@@ -348,6 +331,63 @@ namespace LP2_P2
             {
                 ghost.state = GhostState.chase;
                 updateTimer = true;
+            }
+        }
+
+        private void UpdateGhostBehaviour()
+        {
+            stateSwapTimer++;
+            timer++;
+
+            UpdateGhostState(redGhost);
+            UpdateGhostState(pinkGhost);
+            UpdateGhostState(orangeGhost);
+            UpdateGhostState(blueGhost);
+
+            if (updateTimer)
+            {
+                stateSwapTimer = 0;
+                updateTimer = false;
+            }
+
+            if (timer > -1)
+            {
+                timer = 0;
+
+                if ((int)Math.Sqrt(Math.Pow(Math.Abs(
+                    player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
+                    Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
+                {
+                    orangeTarget.Pos = player.Pos;
+                }
+                else
+                    orangeTarget.Pos = new Position(1, 21);
+
+                if (!(player.OldPos == player.Pos) ||
+                    pinkGhost.Pos == pinkTarget.Pos)
+                {
+                    pinkTarget.Pos = new Position(
+                        ((player.Pos.X - player.OldPos.X) * 3)
+                        + player.Pos.X,
+                        ((player.Pos.Y - player.OldPos.Y) * 3)
+                        + player.Pos.Y);
+                }
+                
+                blueTarget.Pos = new Position(Math.Max
+                    (1, Math.Min(mapVisuals.GetLength(0) - 2,
+                    (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
+                    Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2, 
+                    (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
+
+                pinkGhost.CalcuatePath(pinkTarget);
+                redGhost.CalcuatePath(player);
+                orangeGhost.CalcuatePath(orangeTarget);
+                blueGhost.CalcuatePath(blueTarget);
+
+                pinkGhost.UpdatePosition();
+                redGhost.UpdatePosition();
+                orangeGhost.UpdatePosition();
+                blueGhost.UpdatePosition();
             }
         }
     }
