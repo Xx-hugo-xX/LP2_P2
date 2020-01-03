@@ -44,7 +44,10 @@ namespace LP2_P2
         "O.OOOOOOOOOO.O.OOOOOOOOOO.O" +
         "O.........................O" +
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO";
-        public GameLoop()
+
+        public HighScoreManager HSManager;
+
+        public GameLoop(HighScoreManager hsManager)
         {
             player = new Player();
 
@@ -58,6 +61,9 @@ namespace LP2_P2
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem(player, db, physicsObjects);
             keyReader = new Thread(inputSys.ReadKeys);
+
+            HSManager = hsManager;
+
             Console.CursorVisible = false;
         }
 
@@ -273,6 +279,13 @@ namespace LP2_P2
                     }
                 }
             }
+        }
+
+        private void KillPlayer()
+        {
+            running = false;
+            HSManager.AddHighScore(player.plyrScore);
+            return;
         }
 
         /// <summary>

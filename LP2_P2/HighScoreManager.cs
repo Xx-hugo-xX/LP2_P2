@@ -144,6 +144,10 @@ namespace LP2_P2
 
                 // Sorts the "highScores" list
                 highScores.Sort();
+
+                // Runs method that saves all High Scores
+                // in the High Scores file
+                SaveHighScores();
             }
             else
             {
@@ -182,7 +186,7 @@ namespace LP2_P2
 
         /// <summary>
         /// Reads the "highScores" list and writes its values
-        /// on the High Scores file, separated by a "tab"
+        /// on the High Scores file
         /// </summary>
         public void SaveHighScores()
         {
@@ -192,8 +196,9 @@ namespace LP2_P2
             // Loops through each element of the "highScores" list
             foreach (Score hs in highScores)
 
-                // Writes the Names and TotalScores of each element
-                // of the "highScores" list on the High Scores File
+                // Writes the Names and TotalScores (separated by a 'tab')
+                // of each element of the "highScores" list
+                // on the High Scores file
                 sw.WriteLine(hs.Name + "\t" + hs.TotalScore);
         }
     }
