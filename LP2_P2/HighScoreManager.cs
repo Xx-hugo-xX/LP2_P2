@@ -126,18 +126,20 @@ namespace LP2_P2
                 if (score.Name == default)
                 {
                     // Asks user to input their name
-                    Console.WriteLine("New High Score!" +
+                    Console.WriteLine("New High Score! " +
                         "What should we call you?\n");
 
                     // Sets Score's name based on user input
                     score.InsertName(Console.ReadLine());
                 }
 
-
                 // Tells the user that their score
                 // has been added to the High Scores
                 Console.WriteLine($"\nYour score of {score.TotalScore} was " +
                     $"added to the High Scores!");
+
+                // Only let's user advance after he presses any key
+                //Console.ReadKey(true);
 
                 // Adds the Score to the "highScores" list
                 highScores.Add(score);
@@ -152,7 +154,7 @@ namespace LP2_P2
             else
             {
                 Console.Clear();
-                Console.WriteLine("Your score isn't an High Score." +
+                Console.WriteLine("Your score isn't an High Score. " +
                     "Better luck next time!");
                 Console.ReadKey(true);
             }

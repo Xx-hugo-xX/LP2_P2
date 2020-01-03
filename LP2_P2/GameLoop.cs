@@ -36,7 +36,7 @@ namespace LP2_P2
         "     O.OO         OO.O     " +
         "     O.OO OOOOOOO OO.O     " +
         "OOOOOO.OO O     O OO.OOOOOO" +
-        "T     .   O     O   .     T" +
+        "T......   O     O   ......T" +
         "OOOOOO.OO O     O OO.OOOOOO" +
         "     O.OO OOOOOOO OO.O     " +
         "     O.OO         OO.O     " +
@@ -226,12 +226,17 @@ namespace LP2_P2
                     // to 1
                     player.Pos.X = player.Pos.X == 0 ? 26 : 1;
                 }
+
+                if (obj.GetType() == typeof(Ghost))
+                {
+                    KillPlayer();
+                }
             }
         }
 
         public void Render()
         {
-            Console.WriteLine(player.plyrScore);
+            Console.WriteLine(player.plyrScore.ToString());
             // Loop for the amount of chars in the second position of the array
             for (int y = 0; y < 23; y++)
             {
@@ -322,7 +327,6 @@ namespace LP2_P2
         {
             running = false;
             HSManager.AddHighScore(player.plyrScore);
-            return;
         }
 
         /// <summary>

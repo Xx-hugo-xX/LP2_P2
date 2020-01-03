@@ -10,7 +10,7 @@ namespace LP2_P2
 
         public Score()
         {
-            Name = "";
+            Name = default;
             TotalScore = 0;
         }
 
