@@ -13,13 +13,22 @@ namespace LP2_P2
             Y = y;
         }
 
-        public static bool operator ==(Position A, Position B)
+        public static bool operator ==(Position A, Position B) => 
+            A.X == B.X && A.Y == B.Y;
+        public static bool operator !=(Position A, Position B) =>
+            A.X != B.X && A.Y != B.Y;
+
+        public override bool Equals(object obj)
         {
-            return A.X == B.X && A.Y == B.Y;
+            if (ReferenceEquals(this, obj))
+                return true;
+            else
+                return false;
         }
-        public static bool operator !=(Position A, Position B)
+
+        public override int GetHashCode()
         {
-            return A.X != B.X && A.Y != B.Y;
+            return base.GetHashCode();
         }
     }
 }

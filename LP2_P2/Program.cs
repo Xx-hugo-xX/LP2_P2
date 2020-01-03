@@ -6,7 +6,7 @@ namespace LP2_P2
     {
         private const int WindowWidth = 50;
         private const int WindowHeight = 50;
-        static void Main(string[] args)
+        static void Main()
         {
             Console.WindowWidth = WindowWidth * 2;
             Console.WindowHeight = WindowHeight;

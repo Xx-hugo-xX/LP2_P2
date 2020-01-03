@@ -10,20 +10,33 @@ namespace LP2_P2
     {
         // Creates a list for storing a temporary path
         private readonly List<Object> open = new List<Object>();
+
         // Creates an HashSet for storing a locked path
         private readonly HashSet<Object> closed = new HashSet<Object>();
-        // Creates a List to store the neigbhoring pieces of the current Object 
+
+        // Creates a List to store the neigbhoring pieces of the current Object
         private readonly List<Object> neighbors = new List<Object>();
+
         // Creates a List to store all the Objects on the board
         private readonly List<Object> allPieces = new List<Object>();
-        // Creates the corner the ghosts should go to when in scatter or 
-        // frighten mode
+
+        // Creates the corner the ghosts should go to when in scatter mode
         private readonly EmptySpace corner;
+
+        // Creates a EmptyPiece to be used as target if eaten
         private readonly EmptySpace center = new EmptySpace(13, 7);
+
         // Stores the state the ghosts are currently in
         public GhostState state;
+
         // Creates a variable of the type random
-        private Random rnd = new Random();
+        private readonly Random rnd = new Random();
+
+        // The finished full path to the target
+        private readonly List<Position> path = new List<Position>();
+
+        // which position on the path it should update the position to
+        private int counter = 0;
 
         /// <summary>
         /// Constructor of the class Ghost
@@ -31,8 +44,7 @@ namespace LP2_P2
         /// <param name="x"> The wanted X position </param>
         /// <param name="y"> the wanted Y position </param>
         /// <param name="allMapPieces"> The List of all Physics Objects</param>
-        public Ghost(int x, int y, List<Object> allMapPieces,
-            int cornerX, int cornerY)
+        public Ghost(int x, int y, List<Object> allMapPieces, int cX, int cY)
         {
             // Creates a new Position vector and assigns it the x and y value
             Pos = new Position(x, y);
@@ -42,12 +54,12 @@ namespace LP2_P2
             Visuals = 'U';
             // Creates the collider bounding box
             BoxCollider = new int[4] { x, y, x + 1, y + 1 };
-            // Assigns this Object list the one passed as argument 
+            // Assigns this Object list the one passed as argument
             allPieces = allMapPieces;
             // Assigns the ghost state to chase mode
             state = GhostState.chase;
             // Assigns the ghost it's respective corner
-            corner = new EmptySpace(cornerX, cornerY);
+            corner = new EmptySpace(cX, cY);
         }
 
         /// <summary>
@@ -55,27 +67,9 @@ namespace LP2_P2
         /// </summary>
         /// <param name="target"> The end position it should arrive </param>
         /// <returns> A list of Position for the ghost to follow </returns>
-        public List<Position> CalcuatePath(Object target)
+        public void CalcuatePath(Object target)
         {
-            if (state == GhostState.scatter)
-                target = corner;
-
-            if (state == GhostState.frightened)
-            {
-                while (target.GetType() == typeof(Player) ||
-                    target.GetType() == typeof(MapPiece)) 
-                {
-                    target = allPieces[rnd.Next(0, allPieces.Count)];
-                } 
-            }
-            if (state == GhostState.eaten)
-            {
-                if (Pos == center.Pos)
-                    state = GhostState.chase;
-                else
-                    target = center;
-            }
-
+            target = UpdateState(target);
             // Clears the list to make sure they're empty before starting to
             // use them
             open.Clear();
@@ -84,7 +78,7 @@ namespace LP2_P2
             // Adds the the ghost position 'start' to the open list
             open.Add(this);
 
-            // Searches for a path while the open list has something or it 
+            // Searches for a path while the open list has something or it
             // returned something
             while (open.Count > 0)
             {
@@ -98,8 +92,8 @@ namespace LP2_P2
                 {
                     // Checks if the cost of a Object on the open list is less
                     // or equals than the cost of the current Object
-                    if (open[i].combinedCost < current.combinedCost
-                        || open[i].combinedCost == current.combinedCost)
+                    if (open[i].CombinedCost < current.CombinedCost
+                        || open[i].CombinedCost == current.CombinedCost)
                     {
                         // Checks which Object is clossest to the target
                         if (open[i].closenessCost < current.closenessCost)
@@ -116,51 +110,15 @@ namespace LP2_P2
                 // Adds it to the locked path list
                 closed.Add(current);
 
-                // Checks if the current position is the same as the target 
+                // Checks if the current position is the same as the target
                 if (current.Pos == target.Pos)
                 {
-                    // Uses TracePath Method to generate a list and sends it
-                    // back
-                    return TracePath(current);
+                    // Generates a list of positions and sends it back
+                    TracePath(current);
                 }
 
-                // Checks all the objects for the neighbours of the current
-                // piece
-                for (int c = 0; c < allPieces.Count; c++)
-                {
-                    // Checks if that piece is not the Player, a Wall or has
-                    // the same Position has the last position of the ghost
-                    if (allPieces[c].GetType() != typeof(Player) &&
-                        allPieces[c].GetType() != typeof(MapPiece) &&
-                        !(allPieces[c].Pos == OldPos))
-                    {
-                        // Compares the piece position to the cordinates either
-                        // of the four neibghours should be
-                        if (allPieces[c].Pos.X == current.Pos.X + 1
-                            && allPieces[c].Pos.Y == current.Pos.Y ||
-                            allPieces[c].Pos.X == current.Pos.X - 1
-                            && allPieces[c].Pos.Y == current.Pos.Y ||
-                            allPieces[c].Pos.Y == current.Pos.Y + 1
-                            && allPieces[c].Pos.X == current.Pos.X ||
-                            allPieces[c].Pos.Y == current.Pos.Y - 1
-                            && allPieces[c].Pos.X == current.Pos.X)
-                        {
-                            // Checks if the selected piece is a teleporter
-                            if (allPieces[c].GetType() == typeof(Teleporter)) 
-                            {
-                                // Creates a variable and assigns it a value
-                                // if x = 0 x will be 26 else x will be 1
-                                int x = allPieces[c].Pos.X == 0 ? 26 : 1;
-                                // Creates and adds a new Object with the x
-                                // created and the y of the allPieces[c]
-                                neighbors.Add(new EmptySpace(x, allPieces[c].Pos.Y));
-                            }
-                            else
-                                // Adds that Piece to neighbors list
-                                neighbors.Add(allPieces[c]);
-                        }
-                    }
-                }
+                // Gets the 3 neighbors of the current piece
+                GetNeighbors(current);
 
                 // Checks all the Objects on the neighbors list
                 for (int b = 0; b < neighbors.Count; b++)
@@ -174,7 +132,7 @@ namespace LP2_P2
                         int newCostMov = current.distanceCost +
                             GetDistace(current.Pos, neighbors[b].Pos);
 
-                        // Checks if that variable is lower than the current 
+                        // Checks if that variable is lower than the current
                         // distance of the Object and open list doesn't contain it
                         if (newCostMov < neighbors[b].distanceCost
                             || !open.Contains(neighbors[b]))
@@ -191,22 +149,19 @@ namespace LP2_P2
                         }
                     }
                 }
-                // Clears the list of neighbors
-                neighbors.Clear();
             }
-            // If it fails to return a path returns null
-            return null;
         }
+
         /// <summary>
         /// Forms a list of positions by getting the positions of the parents
         /// of the Object until the Object is the start position
         /// </summary>
         /// <param name="end"> The Object it targets </param>
         /// <returns> A list of all the positions of the defined path</returns>
-        private List<Position> TracePath(Object end)
+        private void TracePath(Object end)
         {
             // Creates a list of positions to store the path
-            List<Position> path = new List<Position>();
+            path.Clear();
             // Creates a local Object variable and assigns it the passed Object
             Object currentPiece = end;
 
@@ -214,15 +169,16 @@ namespace LP2_P2
             while (currentPiece != this)
             {
                 // Adds the position of the currentPiece to the list
-                path.Add(currentPiece.Pos);
+                path.Add(new Position(currentPiece.Pos.X, currentPiece.Pos.Y));
                 // Assigns the currentPiece the parent of that piece
                 currentPiece = currentPiece.parent;
             }
             // The path forms from end to start, so it needs to be reversed
             path.Reverse();
-            // Returns the list
-            return path;
+            // Sets the position it should get from path to 0
+            counter = 0;
         }
+
         /// <summary>
         /// A simple method for calculating distances
         /// </summary>
@@ -230,9 +186,120 @@ namespace LP2_P2
         /// <param name="B"> The Second position </param>
         /// <returns> An Integer with the aprox distance between the two
         /// </returns>
-        private int GetDistace(Position A, Position B) => 
-            // Distance formula (square root of ((x-x^2) + (y-y^2))) 
+        private int GetDistace(Position A, Position B) =>
+            // Distance formula (square root of ((x-x^2) + (y-y^2)))
             (int)Math.Sqrt(Math.Pow(Math.Abs(A.X - B.X), 2) +
              Math.Pow(Math.Abs(A.Y - B.Y), 2));
+
+        /// <summary>
+        /// Switches the target of the ghost acording to the state the ghost
+        /// is currently in
+        /// </summary>
+        /// <param name="target"> The target given </param>
+        /// <returns> A new target acording to the current state </returns>
+        private Object UpdateState(Object target)
+        {
+            // if the ghost is in scatter mode
+            if (state == GhostState.scatter)
+                // the target is it's respective corner
+                target = corner;
+
+            // if the ghost is frightened
+            if (state == GhostState.frightened)
+            {
+                // runs a while loop while the target is a wall or a Player
+                while (target.GetType() == typeof(Player) ||
+                    target.GetType() == typeof(MapPiece))
+                {
+                    // Sets the target to be a random piece on the map
+                    target = allPieces[rnd.Next(0, allPieces.Count)];
+                }
+            }
+
+            // if the ghost is eaten
+            if (state == GhostState.eaten)
+            {
+                // Checks if the ghost is already at the center
+                if (Pos == center.Pos)
+                    // Switches to the chase state
+                    state = GhostState.chase;
+                else
+                    // if not the target is the center piece
+                    target = center;
+            }
+            // if it didn't enter any of the if statements it returns what was
+            // passed as argument without changing it.
+            return target;
+        }
+
+        /// <summary>
+        /// Fills the neighbors list with the neighbors of the current piece
+        /// </summary>
+        /// <param name="current"> The piece it should get neigbhors from
+        /// </param>
+        private void GetNeighbors(Object current)
+        {
+            // Clears the list of neighbors
+            neighbors.Clear();
+            // Checks all the objects for the neighbours of the current
+            // piece
+            for (int c = 0; c < allPieces.Count; c++)
+            {
+                // Checks if that piece is not the Player, a Wall or has
+                // the same Position has the last position of the ghost
+                if (allPieces[c].GetType() != typeof(Player) &&
+                    allPieces[c].GetType() != typeof(MapPiece) &&
+                    !(allPieces[c].Pos == OldPos))
+                {
+                    // Compares the piece position to the cordinates either
+                    // of the four neibghours should be
+                    if (allPieces[c].Pos.X == current.Pos.X + 1
+                        && allPieces[c].Pos.Y == current.Pos.Y ||
+                        allPieces[c].Pos.X == current.Pos.X - 1
+                        && allPieces[c].Pos.Y == current.Pos.Y ||
+                        allPieces[c].Pos.Y == current.Pos.Y + 1
+                        && allPieces[c].Pos.X == current.Pos.X ||
+                        allPieces[c].Pos.Y == current.Pos.Y - 1
+                        && allPieces[c].Pos.X == current.Pos.X)
+                    {
+                        // Checks if the selected piece is a teleporter
+                        if (allPieces[c].GetType() == typeof(Teleporter))
+                        {
+                            // Creates a variable and assigns it a value
+                            // if x = 0 x will be 26 else x will be 1
+                            int x = allPieces[c].Pos.X == 0 ? 26 : 1;
+                            // Creates and adds a new Object with the x
+                            // created and the y of the allPieces[c]
+                            neighbors.Add(new EmptySpace(x, allPieces[c].Pos.Y));
+                        }
+                        else
+                            // Adds that Piece to neighbors list
+                            neighbors.Add(allPieces[c]);
+                    }
+                }
+            }
+        }
+
+        public void UpdatePosition()
+        {
+            if (path != null)
+            {
+                if (counter < path.Count)
+                {
+                    OldPos.X = Pos.X;
+                    OldPos.Y = Pos.Y;
+
+                    Pos.X = path[counter].X;
+                    Pos.Y = path[counter].Y;
+
+                    counter++;
+                }
+                else
+                {
+                    counter = 0;
+                }
+            }
+            UpdatePhysics();
+        }
     }
 }
