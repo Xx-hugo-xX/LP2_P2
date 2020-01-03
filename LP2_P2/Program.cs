@@ -11,7 +11,8 @@ namespace LP2_P2
             Console.WindowWidth = WindowWidth * 2;
             Console.WindowHeight = WindowHeight;
 
-            _ = new MainMenu();
+            MainMenu mainMenu = new MainMenu();
+            mainMenu.RunMenu();
         }
     }
 }

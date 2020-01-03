@@ -200,7 +200,10 @@ namespace LP2_P2
                     obj.GetType() == typeof(BigPellet))
                 {
                     if (obj.GetType() == typeof(BigPellet))
+                    {
+                        pinkGhost.state = GhostState.frightened;
                         redGhost.state = GhostState.frightened;
+                    }
                     // Add picked up item's score value to player's score
                     player.plyrScore.AddScore(obj.ScoreVal);
 
