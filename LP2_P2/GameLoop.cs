@@ -11,6 +11,7 @@ namespace LP2_P2
         private readonly InputSystem inputSys;
         private bool running;
         private readonly Thread keyReader;
+        private readonly Thread pathingAI;
 
         private readonly Ghost redGhost;
         private readonly Ghost pinkGhost;
@@ -77,12 +78,14 @@ namespace LP2_P2
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem();
             keyReader = new Thread(inputSys.ReadKeys);
+            pathingAI = new Thread(UpdateGhostBehaviour);
             Console.CursorVisible = false;
         }
 
         public void Loop()
         {
             keyReader.Start();
+            pathingAI.Start();
             running = true;
             while (running)
             {

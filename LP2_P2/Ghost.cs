@@ -38,6 +38,9 @@ namespace LP2_P2
         // which position on the path it should update the position to
         private int counter = 0;
 
+        // Creates a object to lock and unlock case something is using the code
+        private readonly object listlock = new object();
+
         /// <summary>
         /// Constructor of the class Ghost
         /// </summary>
@@ -117,35 +120,40 @@ namespace LP2_P2
                     TracePath(current);
                 }
 
-                // Gets the 3 neighbors of the current piece
-                GetNeighbors(current);
-
-                // Checks all the Objects on the neighbors list
-                for (int b = 0; b < neighbors.Count; b++)
+                // This part of the code uses a list that is used by other
+                // Objects, needs to be locked or will update the neighbors
+                lock (listlock)
                 {
-                    // Checks if the Object is already in the locked path
-                    if (!closed.Contains(neighbors[b]))
-                    {
-                        // Local variable combining the distance to the start and
-                        // the distance between the current position and that
-                        // neibhor
-                        int newCostMov = current.distanceCost +
-                            GetDistace(current.Pos, neighbors[b].Pos);
+                    // Gets the 3 neighbors of the current piece
+                    GetNeighbors(current);
 
-                        // Checks if that variable is lower than the current
-                        // distance of the Object and open list doesn't contain it
-                        if (newCostMov < neighbors[b].distanceCost
-                            || !open.Contains(neighbors[b]))
+                    // Checks all the Objects on the neighbors list
+                    for (int b = 0; b < neighbors.Count; b++)
+                    {
+                        // Checks if the Object is already in the locked path
+                        if (!closed.Contains(neighbors[b]))
                         {
-                            // Sets a new distance cost to that neighbor
-                            neighbors[b].distanceCost = newCostMov;
-                            // Sets a new closeness to that neighbor
-                            neighbors[b].closenessCost =
-                                GetDistace(neighbors[b].Pos, target.Pos);
-                            // Sets the parent of that neighbor the current object
-                            neighbors[b].parent = current;
-                            // Adds that neighbor to the open list
-                            open.Add(neighbors[b]);
+                            // Local variable combining the distance to the start and
+                            // the distance between the current position and that
+                            // neibhor
+                            int newCostMov = current.distanceCost +
+                                GetDistace(current.Pos, neighbors[b].Pos);
+
+                            // Checks if that variable is lower than the current
+                            // distance of the Object and open list doesn't contain it
+                            if (newCostMov < neighbors[b].distanceCost
+                                || !open.Contains(neighbors[b]))
+                            {
+                                // Sets a new distance cost to that neighbor
+                                neighbors[b].distanceCost = newCostMov;
+                                // Sets a new closeness to that neighbor
+                                neighbors[b].closenessCost =
+                                    GetDistace(neighbors[b].Pos, target.Pos);
+                                // Sets the parent of that neighbor the current object
+                                neighbors[b].parent = current;
+                                // Adds that neighbor to the open list
+                                open.Add(neighbors[b]);
+                            }
                         }
                     }
                 }
