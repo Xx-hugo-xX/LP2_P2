@@ -19,7 +19,7 @@
         // Distance from the current to the end position
         public int closenessCost = 0;
         // Combination of the two costs
-        public int combinedCost => distanceCost + closenessCost;
+        public int CombinedCost => distanceCost + closenessCost;
         // The Object found before this one
         public Object parent;
         public virtual int ScoreVal { get; }

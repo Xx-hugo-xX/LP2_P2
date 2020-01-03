@@ -9,21 +9,10 @@ namespace LP2_P2
         public Direction Dir { get; private set; }
         public Direction LastDir { get; set; }
 
-        private BlockingCollection<ConsoleKey> inputCol;
-        private Player player;
-        private DoubleBuffer2D<char> db;
-        private List<Object> physicsObjects;
-        private readonly Physics col;
+        private readonly BlockingCollection<ConsoleKey> inputCol;
 
-        public InputSystem(Player player, DoubleBuffer2D<char> db,
-            List<Object> objects)
-        {
-            this.player = player;
-            this.db = db;
-
-            physicsObjects = objects;
-            col = new Physics(physicsObjects);
-
+        public InputSystem()
+        { 
             inputCol = new BlockingCollection<ConsoleKey>();
             Dir = new Direction();
             LastDir = new Direction();
@@ -37,8 +26,7 @@ namespace LP2_P2
 
         public void ProcessInput()
         {
-            ConsoleKey key;
-            if (inputCol.TryTake(out key))
+            if (inputCol.TryTake(out ConsoleKey key))
             {
                 switch (key)
                 {
