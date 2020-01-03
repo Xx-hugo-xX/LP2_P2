@@ -85,7 +85,7 @@ namespace LP2_P2
         public void Loop()
         {
             keyReader.Start();
-            pathingAI.Start();
+            //pathingAI.Start();
             running = true;
             while (running)
             {
@@ -281,14 +281,14 @@ namespace LP2_P2
                     {
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new DefaultObject(x, y, 
-                            mapVisuals[x, y], ObjectType.pellet));
+                            mapVisuals[x, y], ObjectType.pellet, 10));
                     }
                     // If the current char is a . creates a Pellet
                     if (mapVisuals[x, y] == '-')
                     {
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new DefaultObject(x, y, 
-                            mapVisuals[x, y], ObjectType.bigPellet));
+                            mapVisuals[x, y], ObjectType.bigPellet, 50));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')
