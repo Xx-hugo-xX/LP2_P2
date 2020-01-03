@@ -28,7 +28,7 @@ namespace LP2_P2
             for (int i = 0; i < colliders.Count; i++)
             {
                 // Checks if the Object being checked is not itself
-                if (colliders[i].GetType() != col.GetType() && colliders[i].GetType() != typeof(EmptySpace))
+                if (colliders[i].ObjType != col.ObjType && colliders[i].ObjType != ObjectType.emptySpace)
                 {
                     // Checks if the next X and Y values are inside any
                     // collider of all the Objects
@@ -45,23 +45,5 @@ namespace LP2_P2
             // If it isn't colliding with anything returns null
             return null;
         }        
-        //-----------------Un-Check to check collisions with everything--------
-        //public bool CheckCollisions()
-        //{
-
-        //    for (int b = 0; b < colliders.Count; b++)
-        //    {
-        //        for (int i = 1; i < colliders.Count -1; i++)
-        //        {
-        //            if (i != b &&
-        //                colliders[b].BoxCollider[0] ==
-        //                colliders[i].BoxCollider[0] &&
-        //                colliders[b].BoxCollider[1] ==
-        //                colliders[i].BoxCollider[1])
-        //                return true;
-        //        }
-        //    }
-        //    return false;
-        //}
     }
 }

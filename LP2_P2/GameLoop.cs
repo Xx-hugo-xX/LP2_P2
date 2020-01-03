@@ -18,9 +18,9 @@ namespace LP2_P2
         private readonly Ghost orangeGhost;
         private readonly Ghost blueGhost;
 
-        private readonly EmptySpace pinkTarget = new EmptySpace(0, 0);
-        private readonly EmptySpace orangeTarget = new EmptySpace(0, 0);
-        private readonly EmptySpace blueTarget = new EmptySpace(0,0);
+        private readonly DefaultObject pinkTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
+        private readonly DefaultObject orangeTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
+        private readonly DefaultObject blueTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
 
         private bool updateTimer = false;
         private int timer = 0;
@@ -113,8 +113,8 @@ namespace LP2_P2
                     case Direction.Up:
                         wallDetection = col.Collision(player, 0, -1);
                         // Checks if the next position up is not a wall
-                        if (wallDetection == null || wallDetection.GetType()
-                            != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall)
                         {
                             // Decreases the y of the player by 1
                             player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
@@ -125,8 +125,8 @@ namespace LP2_P2
                     case Direction.Left:
                         wallDetection = col.Collision(player, -1, 0);
                         // Checks if the next position left is not a wall
-                        if (wallDetection == null || wallDetection.GetType()
-                            != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall)
                         {
                             // Decreases the x of the player by 1
                             player.Pos.X = Math.Max(0, player.Pos.X - 1);
@@ -137,8 +137,8 @@ namespace LP2_P2
                     case Direction.Down:
                         wallDetection = col.Collision(player, 0, 1);
                         // Checks if the next position down is not a wall
-                        if (wallDetection == null || wallDetection.GetType()
-                            != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall)
                         {
                             // Increases the y of the player by 1
                             player.Pos.Y =
@@ -150,8 +150,8 @@ namespace LP2_P2
                     case Direction.Right:
                         wallDetection = col.Collision(player, 1, 0);
                         // Checks if the next position right is not a wall
-                        if (wallDetection == null || wallDetection.GetType()
-                            != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall)
                         {
                             // Increases the X of the player by 1
                             player.Pos.X =
@@ -162,7 +162,7 @@ namespace LP2_P2
                 }
 
                 UpdateGhostBehaviour();
-                
+
             }
 
             // Updates the collider of the player to his current position
@@ -172,7 +172,7 @@ namespace LP2_P2
 
             if (obj != null)
             {
-                if (obj.GetType() == typeof(Ghost))
+                if (obj.ObjType == ObjectType.ghost)
                 {
                     Ghost ghost = obj as Ghost;
                     if (ghost.state == GhostState.frightened)
@@ -180,10 +180,10 @@ namespace LP2_P2
                 }
 
                 // Checks if the player is on a Pellet
-                if (obj.GetType() == typeof(SmallPellet) ||
-                    obj.GetType() == typeof(BigPellet))
+                if (obj.ObjType == ObjectType.pellet ||
+                    obj.ObjType == ObjectType.bigPellet)
                 {
-                    if (obj.GetType() == typeof(BigPellet))
+                    if (obj.ObjType == ObjectType.bigPellet)
                     {
                         pinkGhost.state = GhostState.frightened;
                         redGhost.state = GhostState.frightened;
@@ -192,14 +192,16 @@ namespace LP2_P2
                     player.plyrScore.AddScore(obj.ScoreVal);
 
                     if (physicsObjects.Contains(obj))
-                        physicsObjects[physicsObjects.IndexOf(obj)] = new EmptySpace(player.Pos.X, player.Pos.Y);
+                        physicsObjects[physicsObjects.IndexOf(obj)] = 
+                            new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
+                            ObjectType.emptySpace);
                     // Updates visual for position player was in if there was a
                     // a pickable on it
                     mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
                 }
 
                 // Checks if the player is on a Teleporter
-                if (obj.GetType() == typeof(Teleporter))
+                if (obj.ObjType == ObjectType.teleporter)
                 {
                     // If his postition is 0 teleports him to 26 else teleports him
                     // to 1
@@ -271,29 +273,34 @@ namespace LP2_P2
                     if (mapVisuals[x, y] == 'O')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new MapPiece(x, y, x + 1, y + 1));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.wall));
                     }
                     // If the current char is a . creates a Pellet
                     if (mapVisuals[x, y] == '.')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new SmallPellet(x, y));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.pellet));
                     }
                     // If the current char is a . creates a Pellet
                     if (mapVisuals[x, y] == '-')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new BigPellet(x, y));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.bigPellet));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new Teleporter(x, y));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.teleporter));
                     }
                     if (mapVisuals[x, y] == ' ')
                     {
-                        physicsObjects.Add(new EmptySpace(x, y));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.emptySpace));
                     }
                 }
             }
@@ -375,11 +382,11 @@ namespace LP2_P2
                         ((player.Pos.Y - player.OldPos.Y) * 3)
                         + player.Pos.Y);
                 }
-                
+
                 blueTarget.Pos = new Position(Math.Max
                     (1, Math.Min(mapVisuals.GetLength(0) - 2,
                     (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
-                    Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2, 
+                    Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
                     (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
 
                 pinkGhost.CalcuatePath(pinkTarget);

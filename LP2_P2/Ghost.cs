@@ -8,6 +8,7 @@ namespace LP2_P2
     /// </summary>
     class Ghost : Object
     {
+        #region ---variables---
         // Creates a list for storing a temporary path
         private readonly List<Object> open = new List<Object>();
 
@@ -21,10 +22,10 @@ namespace LP2_P2
         private readonly List<Object> allPieces = new List<Object>();
 
         // Creates the corner the ghosts should go to when in scatter mode
-        private readonly EmptySpace corner;
+        private readonly DefaultObject corner;
 
         // Creates a EmptyPiece to be used as target if eaten
-        private readonly EmptySpace center = new EmptySpace(13, 7);
+        private readonly DefaultObject center = new DefaultObject(13, 7, ' ', ObjectType.target);
 
         // Stores the state the ghosts are currently in
         public GhostState state;
@@ -40,6 +41,8 @@ namespace LP2_P2
 
         // Creates a object to lock and unlock case something is using the code
         private readonly object listlock = new object();
+
+        #endregion
 
         /// <summary>
         /// Constructor of the class Ghost
@@ -62,14 +65,13 @@ namespace LP2_P2
             // Assigns the ghost state to chase mode
             state = GhostState.chase;
             // Assigns the ghost it's respective corner
-            corner = new EmptySpace(cX, cY);
+            corner = new DefaultObject(cX, cY, ' ', ObjectType.target);
         }
 
         /// <summary>
         /// A* algorithm for searching the bes path to a position
         /// </summary>
         /// <param name="target"> The end position it should arrive </param>
-        /// <returns> A list of Position for the ghost to follow </returns>
         public void CalcuatePath(Object target)
         {
             target = UpdateState(target);
@@ -165,7 +167,6 @@ namespace LP2_P2
         /// of the Object until the Object is the start position
         /// </summary>
         /// <param name="end"> The Object it targets </param>
-        /// <returns> A list of all the positions of the defined path</returns>
         private void TracePath(Object end)
         {
             // Creates a list of positions to store the path
@@ -216,8 +217,8 @@ namespace LP2_P2
             if (state == GhostState.frightened)
             {
                 // runs a while loop while the target is a wall or a Player
-                while (target.GetType() == typeof(Player) ||
-                    target.GetType() == typeof(MapPiece))
+                while (target.ObjType == ObjectType.player ||
+                    target.ObjType == ObjectType.player)
                 {
                     // Sets the target to be a random piece on the map
                     target = allPieces[rnd.Next(0, allPieces.Count)];
@@ -255,8 +256,8 @@ namespace LP2_P2
             {
                 // Checks if that piece is not the Player, a Wall or has
                 // the same Position has the last position of the ghost
-                if (allPieces[c].GetType() != typeof(Player) &&
-                    allPieces[c].GetType() != typeof(MapPiece) &&
+                if (allPieces[c].ObjType != ObjectType.player &&
+                    allPieces[c].ObjType != ObjectType.wall &&
                     !(allPieces[c].Pos == OldPos))
                 {
                     // Compares the piece position to the cordinates either
@@ -271,14 +272,15 @@ namespace LP2_P2
                         && allPieces[c].Pos.X == current.Pos.X)
                     {
                         // Checks if the selected piece is a teleporter
-                        if (allPieces[c].GetType() == typeof(Teleporter))
+                        if (allPieces[c].ObjType == ObjectType.teleporter)
                         {
                             // Creates a variable and assigns it a value
                             // if x = 0 x will be 26 else x will be 1
                             int x = allPieces[c].Pos.X == 0 ? 26 : 1;
                             // Creates and adds a new Object with the x
                             // created and the y of the allPieces[c]
-                            neighbors.Add(new EmptySpace(x, allPieces[c].Pos.Y));
+                            neighbors.Add(new DefaultObject(x, 
+                                allPieces[c].Pos.Y, 'T', ObjectType.target));
                         }
                         else
                             // Adds that Piece to neighbors list
@@ -288,25 +290,35 @@ namespace LP2_P2
             }
         }
 
+        /// <summary>
+        /// Updates the position of the ghost acording to the path found
+        /// </summary>
         public void UpdatePosition()
         {
+            // Checks if the path has something in it
             if (path != null)
             {
+                // Checks if the counter is less than the amount of positions
                 if (counter < path.Count)
                 {
+                    // Sets the old position to the current one
                     OldPos.X = Pos.X;
                     OldPos.Y = Pos.Y;
 
+                    // Updates the position to one on the path
                     Pos.X = path[counter].X;
                     Pos.Y = path[counter].Y;
 
+                    // Adds one to the counter
                     counter++;
                 }
                 else
                 {
+                    // Resets the counter if it reached the maximum amount
                     counter = 0;
                 }
             }
+            // Updates the collider to be the same as the position
             UpdatePhysics();
         }
     }
