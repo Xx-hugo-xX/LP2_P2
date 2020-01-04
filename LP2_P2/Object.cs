@@ -22,7 +22,9 @@
         public int CombinedCost => distanceCost + closenessCost;
         // The Object found before this one
         public Object parent;
-        public virtual int ScoreVal { get; }
+        // The type of object it is
+        public ObjectType ObjType { get; protected set; }
+        public int ScoreVal { get; protected set; }
 
         // Updates the collider cordinates to match the current position
         public void UpdatePhysics()

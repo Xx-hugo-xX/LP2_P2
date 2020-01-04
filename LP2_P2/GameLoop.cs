@@ -11,11 +11,16 @@ namespace LP2_P2
         private readonly InputSystem inputSys;
         private bool running;
         private readonly Thread keyReader;
+        private readonly Thread pathingAI;
 
         private readonly Ghost redGhost;
         private readonly Ghost pinkGhost;
+        private readonly Ghost orangeGhost;
+        private readonly Ghost blueGhost;
 
-        private readonly EmptySpace pinkTarget = new EmptySpace(0, 0);
+        private readonly DefaultObject pinkTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
+        private readonly DefaultObject orangeTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
+        private readonly DefaultObject blueTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
 
         private bool updateTimer = false;
         private int timer = 0;
@@ -24,7 +29,7 @@ namespace LP2_P2
 
         private readonly List<Object> physicsObjects = new List<Object>();
         private readonly Physics col;
-        private readonly char[,] mapVisuals = new char[28, 23];
+        private readonly char[,] mapVisuals = new char[27, 23];
 
         private readonly string mapBuilder =
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO" +
@@ -35,12 +40,12 @@ namespace LP2_P2
         "O......OO....O....OO......O" +
         "OOOOOO.OOOOO.O.OOOOO.OOOOOO" +
         "     O.OO         OO.O     " +
-        "     O.OO OOOOOOO OO.O     " +
+        "     O.OO OOO OOO OO.O     " +
         "OOOOOO.OO O     O OO.OOOOOO" +
         "T     .   O     O   .     T" +
         "OOOOOO.OO O     O OO.OOOOOO" +
         "     O.OO OOOOOOO OO.O     " +
-        "     O.OO    B    OO.O     " +
+        "     O.OO    F    OO.O     " +
         "OOOOOO.OO OOOOOOO OO.OOOOOO" +
         "O............O............O" +
         "O.OOOO.OOOOO.O.OOOOO.OOOO.O" +
@@ -60,22 +65,29 @@ namespace LP2_P2
             ConvertMapToDoubleArray();
             GenerateMap();
 
-            redGhost = new Ghost(2, 1, physicsObjects, 1, 1);
-            pinkGhost = new Ghost(24, 1, physicsObjects, 25, 1);
+            redGhost = new Ghost(12, 11, physicsObjects, 1, 1);
+            pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1);
+            orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21);
+            blueGhost = new Ghost(15, 11, physicsObjects, 25, 21);
+
             physicsObjects.Add(redGhost);
             physicsObjects.Add(pinkGhost);
+            physicsObjects.Add(orangeGhost);
+            physicsObjects.Add(blueGhost);
 
             col = new Physics(physicsObjects);
 
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem();
             keyReader = new Thread(inputSys.ReadKeys);
+            pathingAI = new Thread(UpdateGhostBehaviour);
             Console.CursorVisible = false;
         }
 
         public void Loop()
         {
             keyReader.Start();
+            //pathingAI.Start();
             running = true;
             while (running)
             {
@@ -83,10 +95,10 @@ namespace LP2_P2
                 inputSys.ProcessInput();
                 Update(mapVisuals);
                 Render();
-                Thread.Sleep(Math.Abs(
-                    (int)(start / 20000)
-                    + 20
-                    - (int)(DateTime.Now.Ticks / 20000)));
+                //Thread.Sleep(Math.Abs(
+                //    (int)(start / 20000)
+                //    + 20
+                //    - (int)(DateTime.Now.Ticks / 20000)));
             }
         }
 
@@ -95,7 +107,7 @@ namespace LP2_P2
             // Clears physicsObjects list and generates the map again, while
             // keeping player's score and incrementing the level number
             // TO DO: RESET PLAYER AND GHOST POSITION (AND GHOST BEHAVIOUR)
-            if (!physicsObjects.Exists(obj => obj.GetType() == typeof(SmallPellet)))
+            if (!physicsObjects.Exists(obj => obj.ObjType == ObjectType.pellet))
             {
                 physicsObjects.Clear();
                 ConvertMapToDoubleArray();
@@ -113,8 +125,8 @@ namespace LP2_P2
                     case Direction.Up:
                         wallDetection = col.Collision(player, 0, -1);
                         // Checks if the next position up is not a wall
-                        if (wallDetection == null || wallDetection.GetType() 
-                            != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall)
                         {
                             // Decreases the y of the player by 1
                             player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
@@ -125,8 +137,8 @@ namespace LP2_P2
                     case Direction.Left:
                         wallDetection = col.Collision(player, -1, 0);
                         // Checks if the next position left is not a wall
-                        if (wallDetection == null || wallDetection.GetType() 
-                            != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall)
                         {
                             // Decreases the x of the player by 1
                             player.Pos.X = Math.Max(0, player.Pos.X - 1);
@@ -137,8 +149,8 @@ namespace LP2_P2
                     case Direction.Down:
                         wallDetection = col.Collision(player, 0, 1);
                         // Checks if the next position down is not a wall
-                        if (wallDetection == null || wallDetection.GetType()
-                            != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall)
                         {
                             // Increases the y of the player by 1
                             player.Pos.Y =
@@ -150,8 +162,8 @@ namespace LP2_P2
                     case Direction.Right:
                         wallDetection = col.Collision(player, 1, 0);
                         // Checks if the next position right is not a wall
-                        if (wallDetection == null || wallDetection.GetType()
-                            != typeof(MapPiece))
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall)
                         {
                             // Increases the X of the player by 1
                             player.Pos.X =
@@ -161,36 +173,8 @@ namespace LP2_P2
                         break;
                 }
 
-                stateSwapTimer++;
-                timer++;
+                UpdateGhostBehaviour();
 
-                UpdateGhost(redGhost);
-                UpdateGhost(pinkGhost);
-
-                if (updateTimer)
-                {
-                    stateSwapTimer = 0;
-                    updateTimer = false;
-                }
-
-                if (timer > 1)
-                {
-                    if (!(player.OldPos == player.Pos) 
-                        || pinkGhost.Pos == pinkTarget.Pos)
-                        pinkTarget.Pos = new Position(
-                            ((player.Pos.X - player.OldPos.X) * 3) 
-                            + player.Pos.X, 
-                            ((player.Pos.Y - player.OldPos.Y) * 3)
-                            + player.Pos.Y);
-
-                    pinkGhost.CalcuatePath(pinkTarget);
-                    redGhost.CalcuatePath(player);
-
-                    redGhost.UpdatePosition();
-                    pinkGhost.UpdatePosition();
-                }
-                Console.WriteLine(pinkGhost.state);
-                Console.WriteLine(redGhost.state);
             }
 
             // Updates the collider of the player to his current position
@@ -200,7 +184,7 @@ namespace LP2_P2
 
             if (obj != null)
             {
-                if (obj.GetType() == typeof(Ghost))
+                if (obj.ObjType == ObjectType.ghost)
                 {
                     Ghost ghost = obj as Ghost;
                     if (ghost.state == GhostState.frightened)
@@ -208,11 +192,11 @@ namespace LP2_P2
                 }
 
                 // Checks if the player is on a Pellet
-                if (obj.GetType() == typeof(SmallPellet) ||
-                    obj.GetType() == typeof(BigPellet) ||
-                    obj.GetType() == typeof(BonusFruit))
+                if (obj.ObjType == ObjectType.pellet ||
+                    obj.ObjType == ObjectType.bigPellet ||
+                    obj.ObjType == ObjectType.bonusFruit)
                 {
-                    if (obj.GetType() == typeof(BigPellet))
+                    if (obj.ObjType == ObjectType.bigPellet)
                     {
                         pinkGhost.state = GhostState.frightened;
                         redGhost.state = GhostState.frightened;
@@ -221,14 +205,16 @@ namespace LP2_P2
                     player.plyrScore.AddScore(obj.ScoreVal);
 
                     if (physicsObjects.Contains(obj))
-                        physicsObjects[physicsObjects.IndexOf(obj)] = new EmptySpace(player.Pos.X, player.Pos.Y);
+                        physicsObjects[physicsObjects.IndexOf(obj)] = 
+                            new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
+                            ObjectType.emptySpace);
                     // Updates visual for position player was in if there was a
                     // a pickable on it
                     mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
                 }
 
                 // Checks if the player is on a Teleporter
-                if (obj.GetType() == typeof(Teleporter))
+                if (obj.ObjType == ObjectType.teleporter)
                 {
                     // If his postition is 0 teleports him to 26 else teleports him
                     // to 1
@@ -241,10 +227,10 @@ namespace LP2_P2
         {
             Console.WriteLine($"{player.plyrScore}\t\tLevel: {level}");
             // Loop for the amount of chars in the second position of the array
-            for (int y = 0; y < 23; y++)
+            for (int y = 0; y < mapVisuals.GetLength(1); y++)
             {
                 // Loop for the amount of chars in the first position of the array
-                for (int x = 0; x < 28; x++)
+                for (int x = 0; x < mapVisuals.GetLength(0); x++)
                 {
                     // Assigns the corresponding visual to the buffer
                     db[x, y] = mapVisuals[x, y];
@@ -255,6 +241,8 @@ namespace LP2_P2
             db[player.Pos.X, player.Pos.Y] = player.Visuals;
             db[redGhost.Pos.X, redGhost.Pos.Y] = redGhost.Visuals;
             db[pinkGhost.Pos.X, pinkGhost.Pos.Y] = 'G';
+            db[orangeGhost.Pos.X, orangeGhost.Pos.Y] = 'L';
+            db[blueGhost.Pos.X, blueGhost.Pos.Y] = 'B';
 
             db.Swap();
 
@@ -289,44 +277,50 @@ namespace LP2_P2
         private void GenerateMap()
         {
             // Loop for the amount of lines in the char array
-            for (int y = 0; y < 23; y++)
+            for (int y = 0; y < mapVisuals.GetLength(1); y++)
             {
                 // Loop for the amount of characters in the char array
-                for (int x = 0; x < 28; x++)
+                for (int x = 0; x < mapVisuals.GetLength(0); x++)
                 {
                     // If the current char is a O creates a wall
                     if (mapVisuals[x, y] == 'O')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new MapPiece(x, y, x + 1, y + 1));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.wall));
                     }
                     // If the current char is a . creates a Pellet
                     if (mapVisuals[x, y] == '.')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new SmallPellet(x, y));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.pellet, 10));
                     }
                     // If the current char is a - creates a BigPellet
                     if (mapVisuals[x, y] == '-')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new BigPellet(x, y));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.bigPellet, 50));
                     }
                     // If the current char is a B creates a BonusFruit
-                    if (mapVisuals[x, y] == 'B')
+                    if (mapVisuals[x, y] == 'F')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new BonusFruit(x, y, 100));
+                        physicsObjects.Add(new DefaultObject(x, y, 'F',
+                            ObjectType.bonusFruit, 100));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new Teleporter(x, y));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.teleporter));
                     }
                     if (mapVisuals[x, y] == ' ')
                     {
-                        physicsObjects.Add(new EmptySpace(x, y));
+                        physicsObjects.Add(new DefaultObject(x, y, 
+                            mapVisuals[x, y], ObjectType.emptySpace));
                     }
                 }
             }
@@ -356,7 +350,7 @@ namespace LP2_P2
             }
         }
 
-        private void UpdateGhost(Ghost ghost)
+        private void UpdateGhostState(Ghost ghost)
         {
             if (stateSwapTimer >= 20 && ghost.state == GhostState.chase)
             {
@@ -367,6 +361,63 @@ namespace LP2_P2
             {
                 ghost.state = GhostState.chase;
                 updateTimer = true;
+            }
+        }
+
+        private void UpdateGhostBehaviour()
+        {
+            stateSwapTimer++;
+            timer++;
+
+            UpdateGhostState(redGhost);
+            UpdateGhostState(pinkGhost);
+            UpdateGhostState(orangeGhost);
+            UpdateGhostState(blueGhost);
+
+            if (updateTimer)
+            {
+                stateSwapTimer = 0;
+                updateTimer = false;
+            }
+
+            if (timer > -1)
+            {
+                timer = 0;
+
+                if ((int)Math.Sqrt(Math.Pow(Math.Abs(
+                    player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
+                    Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
+                {
+                    orangeTarget.Pos = player.Pos;
+                }
+                else
+                    orangeTarget.Pos = new Position(1, 21);
+
+                if (!(player.OldPos == player.Pos) ||
+                    pinkGhost.Pos == pinkTarget.Pos)
+                {
+                    pinkTarget.Pos = new Position(
+                        ((player.Pos.X - player.OldPos.X) * 3)
+                        + player.Pos.X,
+                        ((player.Pos.Y - player.OldPos.Y) * 3)
+                        + player.Pos.Y);
+                }
+
+                blueTarget.Pos = new Position(Math.Max
+                    (1, Math.Min(mapVisuals.GetLength(0) - 2,
+                    (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
+                    Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
+                    (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
+
+                pinkGhost.CalcuatePath(pinkTarget);
+                redGhost.CalcuatePath(player);
+                orangeGhost.CalcuatePath(orangeTarget);
+                blueGhost.CalcuatePath(blueTarget);
+
+                pinkGhost.UpdatePosition();
+                redGhost.UpdatePosition();
+                orangeGhost.UpdatePosition();
+                blueGhost.UpdatePosition();
             }
         }
     }
