@@ -106,18 +106,8 @@ namespace LP2_P2
 
         public void Update(char[,] mapVisuals)
         {
-            // Clears physicsObjects list and generates the map again, while
-            // keeping player's score and incrementing the level number
-            // TO DO: RESET PLAYER AND GHOST POSITION (AND GHOST BEHAVIOUR)
-            if (!physicsObjects.Exists(obj => obj.ObjType == ObjectType.pellet))
-            {
-                physicsObjects.Clear();
-                ConvertMapToDoubleArray();
-                GenerateMap();
-                player.Pos = new Position(13, 17);
-                inputSys.ResetInput();
-                level++;
-            }
+            CheckForLevelFinish();
+
             if (inputSys.Dir != Direction.None)
             {
                 Object wallDetection;
@@ -312,7 +302,8 @@ namespace LP2_P2
                     {
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new DefaultObject(x, y, 'F',
-                            ObjectType.bonusFruit, 100));
+                            ObjectType.bonusFruit,
+                            Math.Min(100*level, 5000)));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')
@@ -422,6 +413,24 @@ namespace LP2_P2
                 redGhost.UpdatePosition();
                 orangeGhost.UpdatePosition();
                 blueGhost.UpdatePosition();
+            }
+        }
+
+        // Increments level number, clears physicsObjects list,
+        // generates the map again, while keeping player's score, places player
+        // back in his starting position and resets input
+        private void CheckForLevelFinish()
+        {
+            if (!physicsObjects.Exists(obj => obj.ObjType == ObjectType.pellet))
+            {
+                level++;
+                // Clear list of physics objects, to generate the level again
+                // into that list
+                physicsObjects.Clear();
+                ConvertMapToDoubleArray();
+                GenerateMap();
+                player.Pos = new Position(13, 17);
+                inputSys.ResetInput();
             }
         }
     }
