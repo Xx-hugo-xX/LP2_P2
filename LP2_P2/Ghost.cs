@@ -50,14 +50,15 @@ namespace LP2_P2
         /// <param name="x"> The wanted X position </param>
         /// <param name="y"> the wanted Y position </param>
         /// <param name="allMapPieces"> The List of all Physics Objects</param>
-        public Ghost(int x, int y, List<Object> allMapPieces, int cX, int cY)
+        public Ghost(int x, int y, List<Object> allMapPieces, int cX, int cY,
+            char visual, int value = 0)
         {
             // Creates a new Position vector and assigns it the x and y value
             Pos = new Position(x, y);
             // Creates a new Position and assigns it the x value -1 and y value
             OldPos = new Position(x - 1, y);
             // Assigns a character to be displayed while rendering
-            Visuals = 'U';
+            Visuals = visual;
             // Creates the collider bounding box
             BoxCollider = new int[4] { x, y, x + 1, y + 1 };
             // Assigns this Object list the one passed as argument
@@ -66,6 +67,11 @@ namespace LP2_P2
             state = GhostState.chase;
             // Assigns the ghost it's respective corner
             corner = new DefaultObject(cX, cY, ' ', ObjectType.target);
+            // Assigns the type to Ghost
+            ObjType = ObjectType.ghost;
+            // Sets the score it should give
+            ScoreVal = value;
+
         }
 
         /// <summary>

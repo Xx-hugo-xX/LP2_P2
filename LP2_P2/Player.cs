@@ -19,7 +19,7 @@
             // Assgins the OldPos from the class it inherits from a new position
             OldPos = new Position(1, 1);
             // Gives it a visual for when it's to be displayed
-            Visuals = 'P';
+            Visuals = 'C';
             // Creates a square collider for the object
             BoxCollider = new int[4] { 0, 0, 0 + 1, 0 + 1 };
             // Sets the value to a new Score class

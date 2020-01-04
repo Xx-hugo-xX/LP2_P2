@@ -9,7 +9,6 @@ namespace LP2_P2
         private readonly Player player;
         private readonly DoubleBuffer2D<char> db;
         private readonly InputSystem inputSys;
-        private bool running;
         private readonly Thread keyReader;
         private readonly Thread pathingAI;
 
@@ -22,9 +21,11 @@ namespace LP2_P2
         private readonly DefaultObject orangeTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
         private readonly DefaultObject blueTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
 
+        private bool running;
         private bool updateTimer = false;
-        private int timer = 0;
+        private int ghostUpdateTimer = 0;
         private int stateSwapTimer = 0;
+        private int frightenTimer = 0;
 
         private readonly List<Object> physicsObjects = new List<Object>();
         private readonly Physics col;
@@ -63,10 +64,10 @@ namespace LP2_P2
             ConvertMapToDoubleArray();
             GenerateMap();
 
-            redGhost = new Ghost(12, 11, physicsObjects, 1, 1);
-            pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1);
-            orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21);
-            blueGhost = new Ghost(15, 11, physicsObjects, 25, 21);
+            redGhost = new Ghost(12, 11, physicsObjects, 1, 1, 'R', 200);
+            pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1, 'P', 200);
+            orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21, 'G', 200);
+            blueGhost = new Ghost(15, 11, physicsObjects, 25, 21, 'B', 200);
 
             physicsObjects.Add(redGhost);
             physicsObjects.Add(pinkGhost);
@@ -85,7 +86,7 @@ namespace LP2_P2
         public void Loop()
         {
             keyReader.Start();
-            //pathingAI.Start();
+            pathingAI.Start();
             running = true;
             while (running)
             {
@@ -160,9 +161,8 @@ namespace LP2_P2
                         }
                         break;
                 }
-
-                UpdateGhostBehaviour();
-
+                // UpdateGhostBehaviour();
+                ghostUpdateTimer++;
             }
 
             // Updates the collider of the player to his current position
@@ -179,22 +179,26 @@ namespace LP2_P2
                         ghost.state = GhostState.eaten;
                 }
 
-                // Checks if the player is on a Pellet
-                if (obj.ObjType == ObjectType.pellet ||
-                    obj.ObjType == ObjectType.bigPellet)
+                if (obj.ObjType == ObjectType.bigPellet)
                 {
-                    if (obj.ObjType == ObjectType.bigPellet)
-                    {
-                        pinkGhost.state = GhostState.frightened;
-                        redGhost.state = GhostState.frightened;
-                    }
-                    // Add picked up item's score value to player's score
-                    player.plyrScore.AddScore(obj.ScoreVal);
+                    redGhost.state = GhostState.frightened;
+                    pinkGhost.state = GhostState.frightened;
+                    orangeGhost.state = GhostState.frightened;
+                    blueGhost.state = GhostState.frightened;
 
-                    if (physicsObjects.Contains(obj))
-                        physicsObjects[physicsObjects.IndexOf(obj)] = 
-                            new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
-                            ObjectType.emptySpace);
+                    physicsObjects[physicsObjects.IndexOf(obj)] =
+                        new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
+                        ObjectType.emptySpace);
+
+                    mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
+                }
+                // Checks if the player is on a Pellet
+                if (obj.ObjType == ObjectType.pellet)
+                {
+                    physicsObjects[physicsObjects.IndexOf(obj)] =
+                        new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
+                        ObjectType.emptySpace);
+
                     // Updates visual for position player was in if there was a
                     // a pickable on it
                     mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
@@ -207,6 +211,9 @@ namespace LP2_P2
                     // to 1
                     player.Pos.X = player.Pos.X == 0 ? 26 : 1;
                 }
+
+                // Add picked up item's score value to player's score
+                player.plyrScore.AddScore(obj.ScoreVal);
             }
         }
 
@@ -226,37 +233,71 @@ namespace LP2_P2
 
             // Puts the player position on the buffer
             db[player.Pos.X, player.Pos.Y] = player.Visuals;
-            db[redGhost.Pos.X, redGhost.Pos.Y] = redGhost.Visuals;
-            db[pinkGhost.Pos.X, pinkGhost.Pos.Y] = 'G';
-            db[orangeGhost.Pos.X, orangeGhost.Pos.Y] = 'L';
-            db[blueGhost.Pos.X, blueGhost.Pos.Y] = 'B';
+
+            SetBufferGhostVisuals(redGhost);
+            SetBufferGhostVisuals(pinkGhost);
+            SetBufferGhostVisuals(orangeGhost);
+            SetBufferGhostVisuals(blueGhost);
 
             db.Swap();
 
-            // -------------UnComment the commented sections to generate colors
-            // -------------Impacts performace ALOT!!!-------------------------
             for (int y = 0; y < db.YDim; y++)
             {
                 for (int x = 0; x < db.XDim; x++)
                 {
-                    if (db[x, y] == 'O')                                    // <------------------------------
+                    if (db[x, y] == 'O')
                     {
                         Console.BackgroundColor = ConsoleColor.DarkBlue;
                         Console.ForegroundColor = ConsoleColor.DarkBlue;
                     }
-                    if (db[x, y] == 'c' || db[x, y] == 'o')
+                    if (db[x, y] == 'f')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                    }
+                    if (db[x, y] == 'C')
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    }                                                       // <-------------------------------
+                    }
+
+                    if (db[x, y] == 'R')
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                    }
+                    if (db[x, y] == 'P')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Magenta;
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                    }
+                    if (db[x, y] == 'G')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Red;
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+                    if (db[x, y] == 'B')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Blue;
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                    }
                     Console.Write(db[x, y]);
-                    Console.ResetColor();                                   // <-------------------------------
+                    Console.ResetColor();
                 }
-                Console.WriteLine();
+                Console.Write('\n');
             }
             Console.SetCursorPosition(0, 0);
             db.Clear();
         }
+        private void SetBufferGhostVisuals(Ghost ghost)
+        {
+            if (ghost.state == GhostState.frightened)
+                db[ghost.Pos.X, ghost.Pos.Y] = 'f';
+            else if (ghost.state == GhostState.eaten)
+                db[ghost.Pos.X, ghost.Pos.Y] = '"';
+            else
+                db[ghost.Pos.X, ghost.Pos.Y] = ghost.Visuals;
 
+        }
         /// <summary>
         /// Assembles the map by creating the necessary things and adding them
         /// to a list
@@ -273,33 +314,33 @@ namespace LP2_P2
                     if (mapVisuals[x, y] == 'O')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.wall));
                     }
                     // If the current char is a . creates a Pellet
                     if (mapVisuals[x, y] == '.')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.pellet, 10));
                     }
                     // If the current char is a . creates a Pellet
                     if (mapVisuals[x, y] == '-')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.bigPellet, 50));
                     }
                     // If the current char is a T creates a teleporter
                     if (mapVisuals[x, y] == 'T')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.teleporter));
                     }
                     if (mapVisuals[x, y] == ' ')
                     {
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.emptySpace));
                     }
                 }
@@ -342,63 +383,76 @@ namespace LP2_P2
                 ghost.state = GhostState.chase;
                 updateTimer = true;
             }
+            if (ghost.state == GhostState.frightened)
+            {
+                if (frightenTimer >= 100000000)
+                {
+                    updateTimer = true;
+                    ghost.state = GhostState.chase;
+                }
+                frightenTimer++;
+            }
         }
 
         private void UpdateGhostBehaviour()
         {
-            stateSwapTimer++;
-            timer++;
-
-            UpdateGhostState(redGhost);
-            UpdateGhostState(pinkGhost);
-            UpdateGhostState(orangeGhost);
-            UpdateGhostState(blueGhost);
-
-            if (updateTimer)
+            while (true)
             {
-                stateSwapTimer = 0;
-                updateTimer = false;
-            }
+                UpdateGhostState(redGhost);
+                UpdateGhostState(pinkGhost);
+                UpdateGhostState(orangeGhost);
+                UpdateGhostState(blueGhost);
 
-            if (timer > -1)
-            {
-                timer = 0;
-
-                if ((int)Math.Sqrt(Math.Pow(Math.Abs(
-                    player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
-                    Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
+                if (ghostUpdateTimer > 1)
                 {
-                    orangeTarget.Pos = player.Pos;
+                    ghostUpdateTimer = 0;
+
+                    stateSwapTimer++;
+
+                    if (updateTimer)
+                    {
+                        stateSwapTimer = 0;
+                        frightenTimer = 0;
+                        updateTimer = false;
+                    }
+
+                    if ((int)Math.Sqrt(Math.Pow(Math.Abs(
+                        player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
+                        Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
+                    {
+                        orangeTarget.Pos = player.Pos;
+                    }
+                    else
+                        orangeTarget.Pos = new Position(1, 21);
+
+                    if (!(player.OldPos == player.Pos) ||
+                        pinkGhost.Pos == pinkTarget.Pos)
+                    {
+                        pinkTarget.Pos = new Position(
+                            ((player.Pos.X - player.OldPos.X) * 3)
+                            + player.Pos.X,
+                            ((player.Pos.Y - player.OldPos.Y) * 3)
+                            + player.Pos.Y);
+                    }
+
+                    blueTarget.Pos = new Position(Math.Max
+                        (1, Math.Min(mapVisuals.GetLength(0) - 2,
+                        (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
+                        Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
+                        (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
+
+                    pinkGhost.CalcuatePath(pinkTarget);
+                    redGhost.CalcuatePath(player);
+                    orangeGhost.CalcuatePath(orangeTarget);
+                    blueGhost.CalcuatePath(blueTarget);
+
+                    pinkGhost.UpdatePosition();
+                    redGhost.UpdatePosition();
+                    orangeGhost.UpdatePosition();
+                    blueGhost.UpdatePosition();
                 }
-                else
-                    orangeTarget.Pos = new Position(1, 21);
-
-                if (!(player.OldPos == player.Pos) ||
-                    pinkGhost.Pos == pinkTarget.Pos)
-                {
-                    pinkTarget.Pos = new Position(
-                        ((player.Pos.X - player.OldPos.X) * 3)
-                        + player.Pos.X,
-                        ((player.Pos.Y - player.OldPos.Y) * 3)
-                        + player.Pos.Y);
-                }
-
-                blueTarget.Pos = new Position(Math.Max
-                    (1, Math.Min(mapVisuals.GetLength(0) - 2,
-                    (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
-                    Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
-                    (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
-
-                pinkGhost.CalcuatePath(pinkTarget);
-                redGhost.CalcuatePath(player);
-                orangeGhost.CalcuatePath(orangeTarget);
-                blueGhost.CalcuatePath(blueTarget);
-
-                pinkGhost.UpdatePosition();
-                redGhost.UpdatePosition();
-                orangeGhost.UpdatePosition();
-                blueGhost.UpdatePosition();
             }
         }
+
     }
 }
