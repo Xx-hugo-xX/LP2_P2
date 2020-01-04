@@ -178,23 +178,18 @@ namespace LP2_P2
                     if (ghost.state == GhostState.frightened)
                         ghost.state = GhostState.eaten;
                 }
-
-                if (obj.ObjType == ObjectType.bigPellet)
-                {
-                    redGhost.state = GhostState.frightened;
-                    pinkGhost.state = GhostState.frightened;
-                    orangeGhost.state = GhostState.frightened;
-                    blueGhost.state = GhostState.frightened;
-
-                    physicsObjects[physicsObjects.IndexOf(obj)] =
-                        new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
-                        ObjectType.emptySpace);
-
-                    mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
-                }
                 // Checks if the player is on a Pellet
-                if (obj.ObjType == ObjectType.pellet)
+                else if(obj.ObjType == ObjectType.pellet ||
+                        obj.ObjType == ObjectType.bigPellet)
                 {
+                    if (obj.ObjType == ObjectType.bigPellet)
+                    {
+                        redGhost.state = GhostState.frightened;
+                        pinkGhost.state = GhostState.frightened;
+                        orangeGhost.state = GhostState.frightened;
+                        blueGhost.state = GhostState.frightened;
+                    }
+
                     physicsObjects[physicsObjects.IndexOf(obj)] =
                         new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
                         ObjectType.emptySpace);
@@ -203,9 +198,8 @@ namespace LP2_P2
                     // a pickable on it
                     mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
                 }
-
                 // Checks if the player is on a Teleporter
-                if (obj.ObjType == ObjectType.teleporter)
+                else if (obj.ObjType == ObjectType.teleporter)
                 {
                     // If his postition is 0 teleports him to 26 else teleports him
                     // to 1
@@ -245,40 +239,40 @@ namespace LP2_P2
             {
                 for (int x = 0; x < db.XDim; x++)
                 {
+                    Console.ForegroundColor = ConsoleColor.White;
+
                     if (db[x, y] == 'O')
                     {
                         Console.BackgroundColor = ConsoleColor.DarkBlue;
                         Console.ForegroundColor = ConsoleColor.DarkBlue;
                     }
-                    if (db[x, y] == 'f')
+                    else if (db[x, y] == 'f')
                     {
                         Console.BackgroundColor = ConsoleColor.Cyan;
-                        Console.ForegroundColor = ConsoleColor.Cyan;
                     }
-                    if (db[x, y] == 'C')
+                    else if (db[x, y] == 'C')
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                     }
-
-                    if (db[x, y] == 'R')
+                    else if (db[x, y] == 'R')
                     {
+                        db[x, y] = '"';
                         Console.BackgroundColor = ConsoleColor.DarkRed;
-                        Console.ForegroundColor = ConsoleColor.DarkRed;
                     }
-                    if (db[x, y] == 'P')
+                    else if (db[x, y] == 'P')
                     {
+                        db[x, y] = '"';
                         Console.BackgroundColor = ConsoleColor.Magenta;
-                        Console.ForegroundColor = ConsoleColor.Magenta;
                     }
-                    if (db[x, y] == 'G')
+                    else if (db[x, y] == 'G')
                     {
+                        db[x, y] = '"';
                         Console.BackgroundColor = ConsoleColor.Red;
-                        Console.ForegroundColor = ConsoleColor.Red;
                     }
-                    if (db[x, y] == 'B')
+                    else if (db[x, y] == 'B')
                     {
+                        db[x, y] = '"';
                         Console.BackgroundColor = ConsoleColor.Blue;
-                        Console.ForegroundColor = ConsoleColor.Blue;
                     }
                     Console.Write(db[x, y]);
                     Console.ResetColor();
@@ -288,13 +282,23 @@ namespace LP2_P2
             Console.SetCursorPosition(0, 0);
             db.Clear();
         }
+        /// <summary>
+        /// Changes the visuals of the ghosts will appear acording to their
+        /// state
+        /// </summary>
+        /// <param name="ghost"> The current ghost being checked </param>
         private void SetBufferGhostVisuals(Ghost ghost)
         {
+            // Checks if the ghost is in frightened state
             if (ghost.state == GhostState.frightened)
+                // Changes their visual to an f
                 db[ghost.Pos.X, ghost.Pos.Y] = 'f';
+            // Checks if the ghost is in a eaten state
             else if (ghost.state == GhostState.eaten)
+                // Changes their visual to an "
                 db[ghost.Pos.X, ghost.Pos.Y] = '"';
             else
+                // If it's none of the above sets it to it's usual visual
                 db[ghost.Pos.X, ghost.Pos.Y] = ghost.Visuals;
 
         }
@@ -338,15 +342,16 @@ namespace LP2_P2
                         physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.teleporter));
                     }
+                    // If the current char is empty creates an empty space
                     if (mapVisuals[x, y] == ' ')
                     {
+                        // Creates and Adds that Object to the list
                         physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.emptySpace));
                     }
                 }
             }
         }
-
         /// <summary>
         /// Converts the string with the visuals to a double char array to be
         /// easier to acess and manipulate
@@ -370,82 +375,122 @@ namespace LP2_P2
                 }
             }
         }
-
+        /// <summary>
+        /// Updates the state of the ghost acording to a timer or a collision
+        /// </summary>
+        /// <param name="ghost"></param>
         private void UpdateGhostState(Ghost ghost)
         {
+            // Checks if the timer is bigger than 20 and is in chase mode
             if (stateSwapTimer >= 20 && ghost.state == GhostState.chase)
             {
+                // switches the state back to scatter
                 ghost.state = GhostState.scatter;
+                // Queues the timer update
                 updateTimer = true;
             }
+            // Checks if the timer is bigger than 7 and is in scatter mode
             else if (stateSwapTimer >= 7 && ghost.state == GhostState.scatter)
             {
+                // switches the state back to chase mode
                 ghost.state = GhostState.chase;
+                // Queues the timer update
                 updateTimer = true;
             }
+            // Checks if the current state is frightened
             if (ghost.state == GhostState.frightened)
             {
+                // Checks if the current timer is bigger than the number
                 if (frightenTimer >= 100000000)
                 {
+                    // Queues the timer update
                     updateTimer = true;
+                    // Switches the state back to chase mode
                     ghost.state = GhostState.chase;
                 }
+                // Adds 1 to the timer
                 frightenTimer++;
             }
         }
-
+        /// <summary>
+        /// Responsible for most of the AI logic and different behaviours
+        /// </summary>
         private void UpdateGhostBehaviour()
         {
+            // A while loop with no end
             while (true)
             {
+                // Checks if the current state of the passed ghost needs to be
+                // changed
                 UpdateGhostState(redGhost);
                 UpdateGhostState(pinkGhost);
                 UpdateGhostState(orangeGhost);
                 UpdateGhostState(blueGhost);
 
-                if (ghostUpdateTimer > 1)
+                // If the timer is bigger than the number, should be updated
+                // once every real Update
+                if (ghostUpdateTimer > 0)
                 {
+                    // Resets the timer back to 0
                     ghostUpdateTimer = 0;
 
+                    // Adds 1 to the state swaping timer
                     stateSwapTimer++;
 
+                    // If the update timer bool is true (was queued)
                     if (updateTimer)
                     {
+                        // Resets both timers used on UpdateGhostState to 0
                         stateSwapTimer = 0;
                         frightenTimer = 0;
+                        // Resets the bool back to false;
                         updateTimer = false;
                     }
-
+                    // Checks if the distance between the player and the 
+                    // orange ghost is greater than 7 units
                     if ((int)Math.Sqrt(Math.Pow(Math.Abs(
                         player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
                         Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
                     {
+                        // The target for the orange ghost become the player
                         orangeTarget.Pos = player.Pos;
                     }
                     else
+                        // The target is the coordinates of its corner
                         orangeTarget.Pos = new Position(1, 21);
 
+                    // checks if the old position of the player is not the
+                    // current position and the the current position of the
+                    // pink ghost is not it's target
                     if (!(player.OldPos == player.Pos) ||
                         pinkGhost.Pos == pinkTarget.Pos)
                     {
+                        // Finds the position the player is moving towards and
+                        // multiplies it by 3 to get the poisition 3 squares 
+                        // ahead of the player
                         pinkTarget.Pos = new Position(
                             ((player.Pos.X - player.OldPos.X) * 3)
                             + player.Pos.X,
                             ((player.Pos.Y - player.OldPos.Y) * 3)
                             + player.Pos.Y);
                     }
-
+                    // Finds the position at the middle of the player and the
+                    // red ghost and flips it 180 degrees while clamping it
+                    // inside the drwawable area
                     blueTarget.Pos = new Position(Math.Max
                         (1, Math.Min(mapVisuals.GetLength(0) - 2,
                         (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
                         Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
                         (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
 
+                    // Calculates the path of the ghost giving it a target
                     pinkGhost.CalcuatePath(pinkTarget);
                     redGhost.CalcuatePath(player);
                     orangeGhost.CalcuatePath(orangeTarget);
                     blueGhost.CalcuatePath(blueTarget);
 
+                    // Updates the current position and the colider of the
+                    // ghost acording to the path calculates above
                     pinkGhost.UpdatePosition();
                     redGhost.UpdatePosition();
                     orangeGhost.UpdatePosition();
@@ -453,6 +498,5 @@ namespace LP2_P2
                 }
             }
         }
-
     }
 }
