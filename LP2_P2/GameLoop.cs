@@ -6,6 +6,7 @@ namespace LP2_P2
 {
     public class GameLoop
     {
+        private Position initialPlyrPos;
         private readonly Player player;
         private readonly DoubleBuffer2D<char> db;
         private readonly InputSystem inputSys;
@@ -59,6 +60,7 @@ namespace LP2_P2
         public GameLoop()
         {
             level = 1;
+            initialPlyrPos = new Position(13, 17);
             player = new Player();
 
             physicsObjects.Add(player);
@@ -112,6 +114,8 @@ namespace LP2_P2
                 physicsObjects.Clear();
                 ConvertMapToDoubleArray();
                 GenerateMap();
+                player.Pos = new Position(13, 17);
+                inputSys.ResetInput();
                 level++;
             }
             if (inputSys.Dir != Direction.None)

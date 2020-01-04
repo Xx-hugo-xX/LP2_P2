@@ -19,6 +19,13 @@ namespace LP2_P2
 
         }
 
+        public void ResetInput()
+        {
+            Dir = Direction.None;
+            LastDir = Direction.None;
+            for (int i = 0; i < inputCol.Count; i++) inputCol.Take();
+        }
+
         public void SetDirection(Direction dir)
         {
             Dir = dir;
