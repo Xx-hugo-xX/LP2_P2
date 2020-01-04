@@ -10,7 +10,6 @@ namespace LP2_P2
         private readonly Player player;
         private readonly DoubleBuffer2D<char> db;
         private readonly InputSystem inputSys;
-        private bool running;
         private readonly Thread keyReader;
         private readonly Thread pathingAI;
 
@@ -23,10 +22,12 @@ namespace LP2_P2
         private readonly DefaultObject orangeTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
         private readonly DefaultObject blueTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
 
+        private bool running;
         private bool updateTimer = false;
-        private int timer = 0;
-        private int stateSwapTimer = 0;
         private int level;
+        private int ghostUpdateTimer = 0;
+        private int stateSwapTimer = 0;
+        private int frightenTimer = 0;
 
         private readonly List<Object> physicsObjects = new List<Object>();
         private readonly Physics col;
@@ -67,10 +68,10 @@ namespace LP2_P2
             ConvertMapToDoubleArray();
             GenerateMap();
 
-            redGhost = new Ghost(12, 11, physicsObjects, 1, 1);
-            pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1);
-            orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21);
-            blueGhost = new Ghost(15, 11, physicsObjects, 25, 21);
+            redGhost = new Ghost(12, 11, physicsObjects, 1, 1, 'R', 200);
+            pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1, 'P', 200);
+            orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21, 'G', 200);
+            blueGhost = new Ghost(15, 11, physicsObjects, 25, 21, 'B', 200);
 
             physicsObjects.Add(redGhost);
             physicsObjects.Add(pinkGhost);
@@ -89,7 +90,7 @@ namespace LP2_P2
         public void Loop()
         {
             keyReader.Start();
-            //pathingAI.Start();
+            pathingAI.Start();
             running = true;
             while (running)
             {
@@ -166,9 +167,8 @@ namespace LP2_P2
                         }
                         break;
                 }
-
-                UpdateGhostBehaviour();
-
+                // UpdateGhostBehaviour();
+                ghostUpdateTimer++;
             }
 
             // Updates the collider of the player to his current position
@@ -184,7 +184,6 @@ namespace LP2_P2
                     if (ghost.state == GhostState.frightened)
                         ghost.state = GhostState.eaten;
                 }
-
                 // Checks if the player is on a Pellet
                 if (obj.ObjType == ObjectType.pellet ||
                     obj.ObjType == ObjectType.bigPellet ||
@@ -192,28 +191,30 @@ namespace LP2_P2
                 {
                     if (obj.ObjType == ObjectType.bigPellet)
                     {
-                        pinkGhost.state = GhostState.frightened;
                         redGhost.state = GhostState.frightened;
+                        pinkGhost.state = GhostState.frightened;
+                        orangeGhost.state = GhostState.frightened;
+                        blueGhost.state = GhostState.frightened;
                     }
-                    // Add picked up item's score value to player's score
-                    player.plyrScore.AddScore(obj.ScoreVal);
 
-                    if (physicsObjects.Contains(obj))
-                        physicsObjects[physicsObjects.IndexOf(obj)] = 
-                            new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
-                            ObjectType.emptySpace);
+                    physicsObjects[physicsObjects.IndexOf(obj)] =
+                        new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
+                        ObjectType.emptySpace);
+
                     // Updates visual for position player was in if there was a
                     // a pickable on it
                     mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
                 }
-
                 // Checks if the player is on a Teleporter
-                if (obj.ObjType == ObjectType.teleporter)
+                else if (obj.ObjType == ObjectType.teleporter)
                 {
                     // If his postition is 0 teleports him to 26 else teleports him
                     // to 1
                     player.Pos.X = player.Pos.X == 0 ? 26 : 1;
                 }
+
+                // Add picked up item's score value to player's score
+                player.plyrScore.AddScore(obj.ScoreVal);
             }
         }
 
@@ -233,37 +234,81 @@ namespace LP2_P2
 
             // Puts the player position on the buffer
             db[player.Pos.X, player.Pos.Y] = player.Visuals;
-            db[redGhost.Pos.X, redGhost.Pos.Y] = redGhost.Visuals;
-            db[pinkGhost.Pos.X, pinkGhost.Pos.Y] = 'G';
-            db[orangeGhost.Pos.X, orangeGhost.Pos.Y] = 'L';
-            db[blueGhost.Pos.X, blueGhost.Pos.Y] = 'B';
+
+            SetBufferGhostVisuals(redGhost);
+            SetBufferGhostVisuals(pinkGhost);
+            SetBufferGhostVisuals(orangeGhost);
+            SetBufferGhostVisuals(blueGhost);
 
             db.Swap();
 
-            // -------------UnComment the commented sections to generate colors
-            // -------------Impacts performace ALOT!!!-------------------------
             for (int y = 0; y < db.YDim; y++)
             {
                 for (int x = 0; x < db.XDim; x++)
                 {
-                    if (db[x, y] == 'O')                                    // <------------------------------
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    if (db[x, y] == 'O')
                     {
                         Console.BackgroundColor = ConsoleColor.DarkBlue;
                         Console.ForegroundColor = ConsoleColor.DarkBlue;
                     }
-                    if (db[x, y] == 'c' || db[x, y] == 'o')
+                    else if (db[x, y] == 'f')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Cyan;
+                    }
+                    else if (db[x, y] == 'C')
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    }                                                       // <-------------------------------
+                    }
+                    else if (db[x, y] == 'R')
+                    {
+                        db[x, y] = '"';
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                    }
+                    else if (db[x, y] == 'P')
+                    {
+                        db[x, y] = '"';
+                        Console.BackgroundColor = ConsoleColor.Magenta;
+                    }
+                    else if (db[x, y] == 'G')
+                    {
+                        db[x, y] = '"';
+                        Console.BackgroundColor = ConsoleColor.Red;
+                    }
+                    else if (db[x, y] == 'B')
+                    {
+                        db[x, y] = '"';
+                        Console.BackgroundColor = ConsoleColor.Blue;
+                    }
                     Console.Write(db[x, y]);
-                    Console.ResetColor();                                   // <-------------------------------
+                    Console.ResetColor();
                 }
-                Console.WriteLine();
+                Console.Write('\n');
             }
             Console.SetCursorPosition(0, 0);
             db.Clear();
         }
+        /// <summary>
+        /// Changes the visuals of the ghosts will appear acording to their
+        /// state
+        /// </summary>
+        /// <param name="ghost"> The current ghost being checked </param>
+        private void SetBufferGhostVisuals(Ghost ghost)
+        {
+            // Checks if the ghost is in frightened state
+            if (ghost.state == GhostState.frightened)
+                // Changes their visual to an f
+                db[ghost.Pos.X, ghost.Pos.Y] = 'f';
+            // Checks if the ghost is in a eaten state
+            else if (ghost.state == GhostState.eaten)
+                // Changes their visual to an "
+                db[ghost.Pos.X, ghost.Pos.Y] = '"';
+            else
+                // If it's none of the above sets it to it's usual visual
+                db[ghost.Pos.X, ghost.Pos.Y] = ghost.Visuals;
 
+        }
         /// <summary>
         /// Assembles the map by creating the necessary things and adding them
         /// to a list
@@ -280,21 +325,21 @@ namespace LP2_P2
                     if (mapVisuals[x, y] == 'O')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.wall));
                     }
                     // If the current char is a . creates a Pellet
                     if (mapVisuals[x, y] == '.')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.pellet, 10));
                     }
                     // If the current char is a - creates a BigPellet
                     if (mapVisuals[x, y] == '-')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.bigPellet, 50));
                     }
                     // If the current char is a B creates a BonusFruit
@@ -309,18 +354,19 @@ namespace LP2_P2
                     if (mapVisuals[x, y] == 'T')
                     {
                         // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.teleporter));
                     }
+                    // If the current char is empty creates an empty space
                     if (mapVisuals[x, y] == ' ')
                     {
-                        physicsObjects.Add(new DefaultObject(x, y, 
+                        // Creates and Adds that Object to the list
+                        physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.emptySpace));
                     }
                 }
             }
         }
-
         /// <summary>
         /// Converts the string with the visuals to a double char array to be
         /// easier to acess and manipulate
@@ -344,75 +390,127 @@ namespace LP2_P2
                 }
             }
         }
-
+        /// <summary>
+        /// Updates the state of the ghost acording to a timer or a collision
+        /// </summary>
+        /// <param name="ghost"></param>
         private void UpdateGhostState(Ghost ghost)
         {
+            // Checks if the timer is bigger than 20 and is in chase mode
             if (stateSwapTimer >= 20 && ghost.state == GhostState.chase)
             {
+                // switches the state back to scatter
                 ghost.state = GhostState.scatter;
+                // Queues the timer update
                 updateTimer = true;
             }
+            // Checks if the timer is bigger than 7 and is in scatter mode
             else if (stateSwapTimer >= 7 && ghost.state == GhostState.scatter)
             {
+                // switches the state back to chase mode
                 ghost.state = GhostState.chase;
+                // Queues the timer update
                 updateTimer = true;
             }
+            // Checks if the current state is frightened
+            if (ghost.state == GhostState.frightened)
+            {
+                // Checks if the current timer is bigger than the number
+                if (frightenTimer >= 100000000)
+                {
+                    // Queues the timer update
+                    updateTimer = true;
+                    // Switches the state back to chase mode
+                    ghost.state = GhostState.chase;
+                }
+                // Adds 1 to the timer
+                frightenTimer++;
+            }
         }
-
+        /// <summary>
+        /// Responsible for most of the AI logic and different behaviours
+        /// </summary>
         private void UpdateGhostBehaviour()
         {
-            stateSwapTimer++;
-            timer++;
-
-            UpdateGhostState(redGhost);
-            UpdateGhostState(pinkGhost);
-            UpdateGhostState(orangeGhost);
-            UpdateGhostState(blueGhost);
-
-            if (updateTimer)
+            // A while loop with no end
+            while (true)
             {
-                stateSwapTimer = 0;
-                updateTimer = false;
-            }
+                // Checks if the current state of the passed ghost needs to be
+                // changed
+                UpdateGhostState(redGhost);
+                UpdateGhostState(pinkGhost);
+                UpdateGhostState(orangeGhost);
+                UpdateGhostState(blueGhost);
 
-            if (timer > -1)
-            {
-                timer = 0;
-
-                if ((int)Math.Sqrt(Math.Pow(Math.Abs(
-                    player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
-                    Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
+                // If the timer is bigger than the number, should be updated
+                // once every real Update
+                if (ghostUpdateTimer > 0)
                 {
-                    orangeTarget.Pos = player.Pos;
+                    // Resets the timer back to 0
+                    ghostUpdateTimer = 0;
+
+                    // Adds 1 to the state swaping timer
+                    stateSwapTimer++;
+
+                    // If the update timer bool is true (was queued)
+                    if (updateTimer)
+                    {
+                        // Resets both timers used on UpdateGhostState to 0
+                        stateSwapTimer = 0;
+                        frightenTimer = 0;
+                        // Resets the bool back to false;
+                        updateTimer = false;
+                    }
+                    // Checks if the distance between the player and the 
+                    // orange ghost is greater than 7 units
+                    if ((int)Math.Sqrt(Math.Pow(Math.Abs(
+                        player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
+                        Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
+                    {
+                        // The target for the orange ghost become the player
+                        orangeTarget.Pos = player.Pos;
+                    }
+                    else
+                        // The target is the coordinates of its corner
+                        orangeTarget.Pos = new Position(1, 21);
+
+                    // checks if the old position of the player is not the
+                    // current position and the the current position of the
+                    // pink ghost is not it's target
+                    if (!(player.OldPos == player.Pos) ||
+                        pinkGhost.Pos == pinkTarget.Pos)
+                    {
+                        // Finds the position the player is moving towards and
+                        // multiplies it by 3 to get the poisition 3 squares 
+                        // ahead of the player
+                        pinkTarget.Pos = new Position(
+                            ((player.Pos.X - player.OldPos.X) * 3)
+                            + player.Pos.X,
+                            ((player.Pos.Y - player.OldPos.Y) * 3)
+                            + player.Pos.Y);
+                    }
+                    // Finds the position at the middle of the player and the
+                    // red ghost and flips it 180 degrees while clamping it
+                    // inside the drwawable area
+                    blueTarget.Pos = new Position(Math.Max
+                        (1, Math.Min(mapVisuals.GetLength(0) - 2,
+                        (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
+                        Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
+                        (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
+
+                    // Calculates the path of the ghost giving it a target
+                    pinkGhost.CalcuatePath(pinkTarget);
+                    redGhost.CalcuatePath(player);
+                    orangeGhost.CalcuatePath(orangeTarget);
+                    blueGhost.CalcuatePath(blueTarget);
+
+                    // Updates the current position and the colider of the
+                    // ghost acording to the path calculates above
+                    pinkGhost.UpdatePosition();
+                    redGhost.UpdatePosition();
+                    orangeGhost.UpdatePosition();
+                    blueGhost.UpdatePosition();
                 }
-                else
-                    orangeTarget.Pos = new Position(1, 21);
-
-                if (!(player.OldPos == player.Pos) ||
-                    pinkGhost.Pos == pinkTarget.Pos)
-                {
-                    pinkTarget.Pos = new Position(
-                        ((player.Pos.X - player.OldPos.X) * 3)
-                        + player.Pos.X,
-                        ((player.Pos.Y - player.OldPos.Y) * 3)
-                        + player.Pos.Y);
-                }
-
-                blueTarget.Pos = new Position(Math.Max
-                    (1, Math.Min(mapVisuals.GetLength(0) - 2,
-                    (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
-                    Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
-                    (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
-
-                pinkGhost.CalcuatePath(pinkTarget);
-                redGhost.CalcuatePath(player);
-                orangeGhost.CalcuatePath(orangeTarget);
-                blueGhost.CalcuatePath(blueTarget);
-
-                pinkGhost.UpdatePosition();
-                redGhost.UpdatePosition();
-                orangeGhost.UpdatePosition();
-                blueGhost.UpdatePosition();
             }
         }
 

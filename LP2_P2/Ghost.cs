@@ -50,14 +50,15 @@ namespace LP2_P2
         /// <param name="x"> The wanted X position </param>
         /// <param name="y"> the wanted Y position </param>
         /// <param name="allMapPieces"> The List of all Physics Objects</param>
-        public Ghost(int x, int y, List<Object> allMapPieces, int cX, int cY)
+        public Ghost(int x, int y, List<Object> allMapPieces, int cX, int cY,
+            char visual, int value = 0)
         {
             // Creates a new Position vector and assigns it the x and y value
             Pos = new Position(x, y);
             // Creates a new Position and assigns it the x value -1 and y value
             OldPos = new Position(x - 1, y);
             // Assigns a character to be displayed while rendering
-            Visuals = 'U';
+            Visuals = visual;
             // Creates the collider bounding box
             BoxCollider = new int[4] { x, y, x + 1, y + 1 };
             // Assigns this Object list the one passed as argument
@@ -66,6 +67,11 @@ namespace LP2_P2
             state = GhostState.chase;
             // Assigns the ghost it's respective corner
             corner = new DefaultObject(cX, cY, ' ', ObjectType.target);
+            // Assigns the type to Ghost
+            ObjType = ObjectType.ghost;
+            // Sets the score it should give
+            ScoreVal = value;
+
         }
 
         /// <summary>
@@ -122,43 +128,39 @@ namespace LP2_P2
                     TracePath(current);
                 }
 
-                // This part of the code uses a list that is used by other
-                // Objects, needs to be locked or will update the neighbors
-                lock (listlock)
+                // Gets the 3 neighbors of the current piece
+                GetNeighbors(current);
+
+                // Checks all the Objects on the neighbors list
+                for (int b = 0; b < neighbors.Count; b++)
                 {
-                    // Gets the 3 neighbors of the current piece
-                    GetNeighbors(current);
-
-                    // Checks all the Objects on the neighbors list
-                    for (int b = 0; b < neighbors.Count; b++)
+                    // Checks if the Object is already in the locked path
+                    if (!closed.Contains(neighbors[b]))
                     {
-                        // Checks if the Object is already in the locked path
-                        if (!closed.Contains(neighbors[b]))
-                        {
-                            // Local variable combining the distance to the start and
-                            // the distance between the current position and that
-                            // neibhor
-                            int newCostMov = current.distanceCost +
-                                GetDistace(current.Pos, neighbors[b].Pos);
+                        // Local variable combining the distance to the start and
+                        // the distance between the current position and that
+                        // neibhor
+                        int newCostMov = current.distanceCost +
+                            GetDistace(current.Pos, neighbors[b].Pos);
 
-                            // Checks if that variable is lower than the current
-                            // distance of the Object and open list doesn't contain it
-                            if (newCostMov < neighbors[b].distanceCost
-                                || !open.Contains(neighbors[b]))
-                            {
-                                // Sets a new distance cost to that neighbor
-                                neighbors[b].distanceCost = newCostMov;
-                                // Sets a new closeness to that neighbor
-                                neighbors[b].closenessCost =
-                                    GetDistace(neighbors[b].Pos, target.Pos);
-                                // Sets the parent of that neighbor the current object
-                                neighbors[b].parent = current;
-                                // Adds that neighbor to the open list
-                                open.Add(neighbors[b]);
-                            }
+                        // Checks if that variable is lower than the current
+                        // distance of the Object and open list doesn't contain it
+                        if (newCostMov < neighbors[b].distanceCost
+                            || !open.Contains(neighbors[b]))
+                        {
+                            // Sets a new distance cost to that neighbor
+                            neighbors[b].distanceCost = newCostMov;
+                            // Sets a new closeness to that neighbor
+                            neighbors[b].closenessCost =
+                                GetDistace(neighbors[b].Pos, target.Pos);
+                            // Sets the parent of that neighbor the current object
+                            neighbors[b].parent = current;
+                            // Adds that neighbor to the open list
+                            open.Add(neighbors[b]);
                         }
                     }
                 }
+
             }
         }
 
@@ -279,7 +281,7 @@ namespace LP2_P2
                             int x = allPieces[c].Pos.X == 0 ? 26 : 1;
                             // Creates and adds a new Object with the x
                             // created and the y of the allPieces[c]
-                            neighbors.Add(new DefaultObject(x, 
+                            neighbors.Add(new DefaultObject(x,
                                 allPieces[c].Pos.Y, 'T', ObjectType.target));
                         }
                         else
