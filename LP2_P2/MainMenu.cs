@@ -23,6 +23,7 @@ namespace LP2_P2
                 Console.Clear();
                 Console.WriteLine("1. Play\n" +
                     "2. High Scores\n" +
+                    "3. Controls\n" +
                     "Q. Quit");
                 key = Console.ReadKey(true).Key;
                 switch (key)
@@ -32,6 +33,9 @@ namespace LP2_P2
                         break;
                     case ConsoleKey.D2:
                         ShowHighScores();
+                        break;
+                    case ConsoleKey.D3:
+                        ShowControls();
                         break;
                     case ConsoleKey.Q:
                         Quit();
@@ -59,6 +63,17 @@ namespace LP2_P2
                 Console.WriteLine($"Player: {name}\tScore: {score, 4}");
             }
 
+            Console.ReadKey(true);
+        }
+
+        public void ShowControls()
+        {
+            Console.Clear();
+            Console.WriteLine("W - Go up\n" +
+                "A - Go left\n" +
+                "S - Go down\n" +
+                "D - Go right\n" +
+                "Press any key to return to the Main Menu.");
             Console.ReadKey(true);
         }
 

@@ -84,6 +84,8 @@ namespace LP2_P2
             inputSys = new InputSystem();
             keyReader = new Thread(inputSys.ReadKeys);
             pathingAI = new Thread(UpdateGhostBehaviour);
+            keyReader.Name = "InputThread";
+            pathingAI.Name = "AIThread";
             Console.CursorVisible = false;
         }
 
@@ -444,7 +446,7 @@ namespace LP2_P2
 
                 // If the timer is bigger than the number, should be updated
                 // once every real Update
-                if (ghostUpdateTimer > 0)
+                if (ghostUpdateTimer > 1)
                 {
                     // Resets the timer back to 0
                     ghostUpdateTimer = 0;
