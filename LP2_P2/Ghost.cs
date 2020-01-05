@@ -185,7 +185,10 @@ namespace LP2_P2
                 currentPiece = currentPiece.parent;
             }
             // The path forms from end to start, so it needs to be reversed
-            path.Reverse();
+            path.Reverse();        
+            // Sets the position it should get from path to 0
+            counter = 0;
+
         }
 
         /// <summary>
@@ -208,25 +211,26 @@ namespace LP2_P2
         /// <returns> A new target acording to the current state </returns>
         private Object UpdateState(Object target)
         {
-            // if the ghost is in scatter mode
-            if (state == GhostState.scatter)
-                // the target is it's respective corner
-                target = corner;
-
-            // if the ghost is frightened
             if (state == GhostState.frightened)
             {
                 // runs a while loop while the target is a wall or a Player
                 while (target.ObjType == ObjectType.player ||
-                    target.ObjType == ObjectType.player)
+                    target.ObjType == ObjectType.wall)
                 {
                     // Sets the target to be a random piece on the map
                     target = allPieces[rnd.Next(0, allPieces.Count)];
                 }
             }
 
+            // if the ghost is in scatter mode
+            else if (state == GhostState.scatter)
+                // the target is it's respective corner
+                target = corner;
+
+            // if the ghost is frightened
+
             // if the ghost is eaten
-            if (state == GhostState.eaten)
+            else if (state == GhostState.eaten)
             {
                 // Checks if the ghost is already at the center
                 if (Pos == center.Pos)
@@ -295,9 +299,6 @@ namespace LP2_P2
         /// </summary>
         public void UpdatePosition()
         {
-            // Sets the position it should get from path to 0
-            counter = 0;
-
             // Checks if the path has something in it
             if (path != null)
             {
@@ -321,8 +322,6 @@ namespace LP2_P2
                     counter = 0;
                 }
             }
-            // Updates the collider to be the same as the position
-            UpdatePhysics();
         }
     }
 }

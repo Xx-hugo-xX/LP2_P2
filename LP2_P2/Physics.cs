@@ -56,8 +56,10 @@ namespace LP2_P2
                 {
                     // Checks if the next X and Y values are inside any
                     // collider of all the Objects
-                    if (col.BoxCollider[0] == colliders[i].BoxCollider[0] &&
-                        col.BoxCollider[1] == colliders[i].BoxCollider[1])
+                    if (col.BoxCollider[0] >= colliders[i].BoxCollider[0]
+                        && col.BoxCollider[2] <= colliders[i].BoxCollider[2] &&
+                        col.BoxCollider[1]  >= colliders[i].BoxCollider[1]
+                        && col.BoxCollider[3]  <= colliders[i].BoxCollider[3])
                     {
                         // If it is inside retruns the type of that Object
                         a.Add(colliders[i]);

@@ -11,7 +11,6 @@ namespace LP2_P2
         private readonly DoubleBuffer2D<char> db;
         private readonly InputSystem inputSys;
         private readonly Thread keyReader;
-        private readonly Thread pathingAI;
 
         private readonly Ghost redGhost;
         private readonly Ghost pinkGhost;
@@ -84,16 +83,13 @@ namespace LP2_P2
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem();
             keyReader = new Thread(inputSys.ReadKeys);
-            pathingAI = new Thread(UpdateGhostBehaviour);
             keyReader.Name = "InputThread";
-            pathingAI.Name = "AIThread";
             Console.CursorVisible = false;
         }
 
         public void Loop()
         {
             keyReader.Start();
-            pathingAI.Start();
             running = true;
             while (running)
             {
@@ -170,20 +166,16 @@ namespace LP2_P2
                         }
                         break;
                 }
-                // UpdateGhostBehaviour();
-                ghostUpdateTimer++;
-
-
-                // Updates the current position and the colider of the
-                // ghost acording to the path calculates above
-                pinkGhost.UpdatePosition();
-                redGhost.UpdatePosition();
-                orangeGhost.UpdatePosition();
-                blueGhost.UpdatePosition();
+                UpdateGhostBehaviour();
             }
 
             // Updates the collider of the player to his current position
             player.UpdatePhysics();
+
+            redGhost.UpdatePhysics();
+            pinkGhost.UpdatePhysics();
+            orangeGhost.UpdatePhysics();
+            blueGhost.UpdatePhysics();
 
             List<Object> obj = col.Collision(player);
 
@@ -195,7 +187,11 @@ namespace LP2_P2
                     {
                         Ghost ghost = obj[i] as Ghost;
                         if (ghost.state == GhostState.frightened)
+                        {
+                            // Add picked up item's score value to player's score
+                            player.plyrScore.AddScore(obj[i].ScoreVal);
                             ghost.state = GhostState.eaten;
+                        }
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||
@@ -217,6 +213,9 @@ namespace LP2_P2
                         // Updates visual for position player was in if there was a
                         // a pickable on it
                         mapVisuals[obj[i].Pos.X, obj[i].Pos.Y] = ' ';
+
+                        // Add picked up item's score value to player's score
+                        player.plyrScore.AddScore(obj[i].ScoreVal);
                     }
                     // Checks if the player is on a Teleporter
                     if (obj[i].ObjType == ObjectType.teleporter)
@@ -225,9 +224,6 @@ namespace LP2_P2
                         // to 1
                         player.Pos.X = player.Pos.X == 0 ? 26 : 1;
                     }
-
-                    // Add picked up item's score value to player's score
-                    player.plyrScore.AddScore(obj[i].ScoreVal);
                 }
             }
         }
@@ -277,22 +273,18 @@ namespace LP2_P2
                     }
                     else if (db[x, y] == 'R')
                     {
-                        db[x, y] = '"';
                         Console.BackgroundColor = ConsoleColor.DarkRed;
                     }
                     else if (db[x, y] == 'P')
                     {
-                        db[x, y] = '"';
                         Console.BackgroundColor = ConsoleColor.Magenta;
                     }
                     else if (db[x, y] == 'G')
                     {
-                        db[x, y] = '"';
                         Console.BackgroundColor = ConsoleColor.Red;
                     }
                     else if (db[x, y] == 'B')
                     {
-                        db[x, y] = '"';
                         Console.BackgroundColor = ConsoleColor.Blue;
                     }
                     Console.Write(db[x, y]);
@@ -459,72 +451,71 @@ namespace LP2_P2
         /// </summary>
         private void UpdateGhostBehaviour()
         {
-            // A while loop with no end
-            while (true)
+            // Checks if the current state of the passed ghost needs to be
+            // changed
+            UpdateGhostState(redGhost);
+            UpdateGhostState(pinkGhost);
+            UpdateGhostState(orangeGhost);
+            UpdateGhostState(blueGhost);
+
+            // If the update timer bool is true (was queued)
+            if (updateTimer)
             {
-                // Checks if the current state of the passed ghost needs to be
-                // changed
-                UpdateGhostState(redGhost);
-                UpdateGhostState(pinkGhost);
-                UpdateGhostState(orangeGhost);
-                UpdateGhostState(blueGhost);
-
-                    // Adds 1 to the state swaping timer
-                    stateSwapTimer++;
-
-                    // If the update timer bool is true (was queued)
-                    if (updateTimer)
-                    {
-                        // Resets both timers used on UpdateGhostState to 0
-                        stateSwapTimer = 0;
-                        frightenTimer = 0;
-                        // Resets the bool back to false;
-                        updateTimer = false;
-                    }
-                    // Checks if the distance between the player and the 
-                    // orange ghost is greater than 7 units
-                    if ((int)Math.Sqrt(Math.Pow(Math.Abs(
-                        player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
-                        Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
-                    {
-                        // The target for the orange ghost become the player
-                        orangeTarget.Pos = player.Pos;
-                    }
-                    else
-                        // The target is the coordinates of its corner
-                        orangeTarget.Pos = new Position(1, 21);
-
-                    // checks if the old position of the player is not the
-                    // current position and the the current position of the
-                    // pink ghost is not it's target
-                    if (!(player.OldPos == player.Pos) ||
-                        pinkGhost.Pos == pinkTarget.Pos)
-                    {
-                        // Finds the position the player is moving towards and
-                        // multiplies it by 3 to get the poisition 3 squares 
-                        // ahead of the player
-                        pinkTarget.Pos = new Position(
-                            ((player.Pos.X - player.OldPos.X) * 3)
-                            + player.Pos.X,
-                            ((player.Pos.Y - player.OldPos.Y) * 3)
-                            + player.Pos.Y);
-                    }
-                    // Finds the position at the middle of the player and the
-                    // red ghost and flips it 180 degrees while clamping it
-                    // inside the drwawable area
-                    blueTarget.Pos = new Position(Math.Max
-                        (1, Math.Min(mapVisuals.GetLength(0) - 2,
-                        (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
-                        Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
-                        (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
-
-
-                    // Calculates the path of the ghost giving it a target
-                    pinkGhost.CalcuatePath(pinkTarget);
-                    redGhost.CalcuatePath(player);
-                    orangeGhost.CalcuatePath(orangeTarget);
-                    blueGhost.CalcuatePath(blueTarget);
+                // Resets both timers used on UpdateGhostState to 0
+                stateSwapTimer = 0;
+                frightenTimer = 0;
+                // Resets the bool back to false;
+                updateTimer = false;
             }
+            // Checks if the distance between the player and the 
+            // orange ghost is greater than 7 units
+            if ((int)Math.Sqrt(Math.Pow(Math.Abs(
+                player.Pos.X - orangeGhost.Pos.X), 2) + Math.Pow(
+                Math.Abs(player.Pos.Y - orangeGhost.Pos.Y), 2)) >= 7)
+            {
+                // The target for the orange ghost become the player
+                orangeTarget.Pos = player.Pos;
+            }
+            else
+                // The target is the coordinates of its corner
+                orangeTarget.Pos = new Position(1, 21);
+
+            // checks if the old position of the player is not the
+            // current position and the the current position of the
+            // pink ghost is not it's target
+            if (!(player.OldPos == player.Pos) ||
+                pinkGhost.Pos == pinkTarget.Pos)
+            {
+                // Finds the position the player is moving towards and
+                // multiplies it by 3 to get the poisition 3 squares 
+                // ahead of the player
+                pinkTarget.Pos = new Position(
+                    ((player.Pos.X - player.OldPos.X) * 3)
+                    + player.Pos.X,
+                    ((player.Pos.Y - player.OldPos.Y) * 3)
+                    + player.Pos.Y);
+            }
+            // Finds the position at the middle of the player and the
+            // red ghost and flips it 180 degrees while clamping it
+            // inside the drwawable area
+            blueTarget.Pos = new Position(Math.Max
+                (1, Math.Min(mapVisuals.GetLength(0) - 2,
+                (player.Pos.X - redGhost.Pos.X) + player.Pos.X)),
+                Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
+                (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
+
+            // Calculates the path of the ghost giving it a target
+            pinkGhost.CalcuatePath(pinkTarget);
+            redGhost.CalcuatePath(player);
+            orangeGhost.CalcuatePath(orangeTarget);
+            blueGhost.CalcuatePath(blueTarget);
+
+            // Updates the current position and the colider of the
+            // ghost acording to the path calculates above
+            pinkGhost.UpdatePosition();
+            redGhost.UpdatePosition();
+            orangeGhost.UpdatePosition();
+            blueGhost.UpdatePosition();
         }
 
         // Increments level number, clears physicsObjects list,
@@ -537,7 +528,9 @@ namespace LP2_P2
                 level++;
                 // Clear list of physics objects, to generate the level again
                 // into that list
+                physicsObjects.Clear();
                 ConvertMapToDoubleArray();
+                GenerateMap();
                 GeneratePickables();
                 player.Pos = new Position(13, 17);
                 inputSys.ResetInput();
