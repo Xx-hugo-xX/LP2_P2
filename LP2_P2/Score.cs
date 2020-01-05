@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace LP2_P2
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Score : IComparable<Score>
     {
         public string Name { get; private set; }
@@ -28,6 +31,7 @@ namespace LP2_P2
 
         public void InsertName()
         {
+            int maxLength = 3;
             List<char> name = new List<char>();
 
             bool valid = false;
@@ -38,18 +42,21 @@ namespace LP2_P2
                         "What should we call you?\n");
 
 
-                foreach (char c in name) Console.Write(c);
+                for (int i = 0; i < name.Count; i++)
+                    Console.Write(name[i]);
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
                 if (name.Count > 0 && keyInfo.Key == ConsoleKey.Backspace)
                     name.RemoveAt(name.Count - 1);
 
-                else if (name.Count < 3 && char.IsLetter(keyInfo.KeyChar))
-                    name.Add(char.ToUpper(keyInfo.KeyChar));
+                else if (name.Count < maxLength &&
+                    char.IsLetter(keyInfo.KeyChar) && keyInfo.KeyChar != 'º')
+                        name.Add(char.ToUpper(keyInfo.KeyChar));
 
-                else if (name.Count == 3 && keyInfo.Key == ConsoleKey.Enter)
-                    valid = true;
+                else if (name.Count == maxLength &&
+                    keyInfo.Key == ConsoleKey.Enter)
+                        valid = true;
             }
 
             Name = new string(name.ToArray());

@@ -27,7 +27,7 @@ namespace LP2_P2
         private int maxHS = 10;
 
         // Declares the list that will store the High Scores
-        public List<Score> highScores;
+        private List<Score> highScores;
 
         public HighScoreManager()
         {
@@ -178,7 +178,7 @@ namespace LP2_P2
         /// Reads the "highScores" list and writes its values
         /// on the High Scores file
         /// </summary>
-        public void SaveHighScores()
+        private void SaveHighScores()
         {
             // Uses StreamWriter to write on the High Scores file
             using StreamWriter sw = new StreamWriter(fileNameFull);
