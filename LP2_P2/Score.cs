@@ -31,7 +31,6 @@ namespace LP2_P2
             List<char> name = new List<char>();
 
             bool valid = false;
-
             while (!valid)
             {
                 Console.Clear();
@@ -53,9 +52,7 @@ namespace LP2_P2
                     valid = true;
             }
 
-            string fullName = new string(name.ToArray());
-
-            Name = fullName;
+            Name = new string(name.ToArray());
         }
 
         public int CompareTo(Score otherScore)

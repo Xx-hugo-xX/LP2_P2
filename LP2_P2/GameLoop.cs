@@ -192,6 +192,8 @@ namespace LP2_P2
                         Ghost ghost = obj[i] as Ghost;
                         if (ghost.state == GhostState.frightened)
                             ghost.state = GhostState.eaten;
+
+                        else KillPlayer();
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||
@@ -225,10 +227,7 @@ namespace LP2_P2
                     player.plyrScore.AddScore(obj[i].ScoreVal);
                 }
 
-                if (obj.GetType() == typeof(Ghost))
-                {
-                    KillPlayer();
-                }
+                
             }
         }
 
@@ -376,8 +375,8 @@ namespace LP2_P2
 
         private void KillPlayer()
         {
-            running = false;
             HSManager.AddHighScore(player.plyrScore);
+            running = false;
         }
 
         /// <summary>
