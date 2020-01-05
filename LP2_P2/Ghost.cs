@@ -186,8 +186,6 @@ namespace LP2_P2
             }
             // The path forms from end to start, so it needs to be reversed
             path.Reverse();
-            // Sets the position it should get from path to 0
-            counter = 0;
         }
 
         /// <summary>
@@ -297,6 +295,9 @@ namespace LP2_P2
         /// </summary>
         public void UpdatePosition()
         {
+            // Sets the position it should get from path to 0
+            counter = 0;
+
             // Checks if the path has something in it
             if (path != null)
             {

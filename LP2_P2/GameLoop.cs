@@ -163,51 +163,62 @@ namespace LP2_P2
                 }
                 // UpdateGhostBehaviour();
                 ghostUpdateTimer++;
+
+
+                // Updates the current position and the colider of the
+                // ghost acording to the path calculates above
+                pinkGhost.UpdatePosition();
+                redGhost.UpdatePosition();
+                orangeGhost.UpdatePosition();
+                blueGhost.UpdatePosition();
             }
 
             // Updates the collider of the player to his current position
             player.UpdatePhysics();
 
-            Object obj = col.Collision(player);
+            List<Object> obj = col.Collision(player);
 
             if (obj != null)
             {
-                if (obj.ObjType == ObjectType.ghost)
+                for (int i = 0; i < obj.Count; i++)
                 {
-                    Ghost ghost = obj as Ghost;
-                    if (ghost.state == GhostState.frightened)
-                        ghost.state = GhostState.eaten;
-                }
-                // Checks if the player is on a Pellet
-                else if(obj.ObjType == ObjectType.pellet ||
-                        obj.ObjType == ObjectType.bigPellet)
-                {
-                    if (obj.ObjType == ObjectType.bigPellet)
+                    if (obj[i].ObjType == ObjectType.ghost)
                     {
-                        redGhost.state = GhostState.frightened;
-                        pinkGhost.state = GhostState.frightened;
-                        orangeGhost.state = GhostState.frightened;
-                        blueGhost.state = GhostState.frightened;
+                        Ghost ghost = obj[i] as Ghost;
+                        if (ghost.state == GhostState.frightened)
+                            ghost.state = GhostState.eaten;
+                    }
+                    // Checks if the player is on a Pellet
+                    if (obj[i].ObjType == ObjectType.pellet ||
+                            obj[i].ObjType == ObjectType.bigPellet)
+                    {
+                        if (obj[i].ObjType == ObjectType.bigPellet)
+                        {
+                            redGhost.state = GhostState.frightened;
+                            pinkGhost.state = GhostState.frightened;
+                            orangeGhost.state = GhostState.frightened;
+                            blueGhost.state = GhostState.frightened;
+                        }
+
+                        physicsObjects[physicsObjects.IndexOf(obj[i])] =
+                            new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
+                            ObjectType.emptySpace);
+
+                        // Updates visual for position player was in if there was a
+                        // a pickable on it
+                        mapVisuals[obj[i].Pos.X, obj[i].Pos.Y] = ' ';
+                    }
+                    // Checks if the player is on a Teleporter
+                    if (obj[i].ObjType == ObjectType.teleporter)
+                    {
+                        // If his postition is 0 teleports him to 26 else teleports him
+                        // to 1
+                        player.Pos.X = player.Pos.X == 0 ? 26 : 1;
                     }
 
-                    physicsObjects[physicsObjects.IndexOf(obj)] =
-                        new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
-                        ObjectType.emptySpace);
-
-                    // Updates visual for position player was in if there was a
-                    // a pickable on it
-                    mapVisuals[obj.Pos.X, obj.Pos.Y] = ' ';
+                    // Add picked up item's score value to player's score
+                    player.plyrScore.AddScore(obj[i].ScoreVal);
                 }
-                // Checks if the player is on a Teleporter
-                else if (obj.ObjType == ObjectType.teleporter)
-                {
-                    // If his postition is 0 teleports him to 26 else teleports him
-                    // to 1
-                    player.Pos.X = player.Pos.X == 0 ? 26 : 1;
-                }
-
-                // Add picked up item's score value to player's score
-                player.plyrScore.AddScore(obj.ScoreVal);
             }
         }
 
@@ -427,13 +438,6 @@ namespace LP2_P2
                 UpdateGhostState(orangeGhost);
                 UpdateGhostState(blueGhost);
 
-                // If the timer is bigger than the number, should be updated
-                // once every real Update
-                if (ghostUpdateTimer > 0)
-                {
-                    // Resets the timer back to 0
-                    ghostUpdateTimer = 0;
-
                     // Adds 1 to the state swaping timer
                     stateSwapTimer++;
 
@@ -483,19 +487,13 @@ namespace LP2_P2
                         Math.Max(1, Math.Min(mapVisuals.GetLength(1) - 2,
                         (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
 
+
                     // Calculates the path of the ghost giving it a target
                     pinkGhost.CalcuatePath(pinkTarget);
                     redGhost.CalcuatePath(player);
                     orangeGhost.CalcuatePath(orangeTarget);
                     blueGhost.CalcuatePath(blueTarget);
-
-                    // Updates the current position and the colider of the
-                    // ghost acording to the path calculates above
-                    pinkGhost.UpdatePosition();
-                    redGhost.UpdatePosition();
-                    orangeGhost.UpdatePosition();
-                    blueGhost.UpdatePosition();
-                }
+                
             }
         }
     }
