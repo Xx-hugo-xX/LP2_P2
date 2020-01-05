@@ -6,13 +6,13 @@ namespace LP2_P2
     public class MainMenu
     {
         GameLoop Game { get; }
-        HighScoreManager HighScoreManager { get; }
+        HighScoreManager HSManager { get; }
 
         public MainMenu()
         {
-            Game = new GameLoop();
-            HighScoreManager = new HighScoreManager();
-            HighScoreManager.CreateFile();
+            HSManager = new HighScoreManager();
+            HSManager.CreateFile();
+            Game = new GameLoop(HSManager);
         }
 
         public void RunMenu()
@@ -42,7 +42,7 @@ namespace LP2_P2
 
         private void ShowHighScores()
         {
-            using StreamReader sr = new StreamReader(HighScoreManager.fileNameFull);
+            using StreamReader sr = new StreamReader(HSManager.fileNameFull);
 
             string s;
             char separator = '\t';

@@ -40,7 +40,7 @@ namespace LP2_P2
         "     O.OO         OO.O     " +
         "     O.OO OOO-OOO OO.O     " +
         "OOOOOO.OO O     O OO.OOOOOO" +
-        "T     .   O     O   .     T" +
+        "T......   O     O   ......T" +
         "OOOOOO.OO O     O OO.OOOOOO" +
         "     O.OO OOOOOOO OO.O     " +
         "     O.OO         OO.O     " +
@@ -54,7 +54,9 @@ namespace LP2_P2
         "O.........................O" +
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO";
 
-        public GameLoop()
+        public HighScoreManager HSManager;
+
+        public GameLoop(HighScoreManager hsManager)
         {
             player = new Player();
 
@@ -77,6 +79,7 @@ namespace LP2_P2
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem();
             keyReader = new Thread(inputSys.ReadKeys);
+            HSManager = hsManager;
             Console.CursorVisible = false;
         }
 
@@ -189,6 +192,8 @@ namespace LP2_P2
                             // Add picked up item's score value to player's score
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                         }
+
+                        else KillPlayer();
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||
@@ -224,12 +229,14 @@ namespace LP2_P2
                             mapVisuals.GetLength(0) - 2 : 1;
                     }
                 }
+
+                
             }
         }
 
         public void Render()
         {
-            Console.WriteLine(player.plyrScore);
+            Console.WriteLine(player.plyrScore.ToString());
             // Loop for the amount of chars in the second position of the array
             for (int y = 0; y < mapVisuals.GetLength(1); y++)
             {
@@ -375,6 +382,13 @@ namespace LP2_P2
                 }
             }
         }
+
+        private void KillPlayer()
+        {
+            HSManager.AddHighScore(player.plyrScore);
+            running = false;
+        }
+
         /// <summary>
         /// Converts the string with the visuals to a double char array to be
         /// easier to acess and manipulate

@@ -46,7 +46,7 @@ namespace LP2_P2
                 Directory.CreateDirectory(filePath);
 
             // Sets the name of the file where the High Scores will be saved
-            fileName = "HighScores";
+            fileName = "HighScores.txt";
 
             // Combines the path and the name of the file in one single string
             fileNameFull = Path.Combine(filePath, fileName);
@@ -124,26 +124,27 @@ namespace LP2_P2
 
                 // Checks if the Score does not have a name associated
                 if (score.Name == default)
-                {
-                    // Asks user to input their name
-                    Console.WriteLine("New High Score!" +
-                        "What should we call you?\n");
 
-                    // Sets Score's name based on user input
-                    score.InsertName(Console.ReadLine());
-                }
-
+                    // Sets Score's Name based on user input
+                    score.InsertName();
 
                 // Tells the user that their score
                 // has been added to the High Scores
                 Console.WriteLine($"\nYour score of {score.TotalScore} was " +
                     $"added to the High Scores!");
 
+                // Only let's user advance after he presses any key
+                Console.ReadKey(true);
+
                 // Adds the Score to the "highScores" list
                 highScores.Add(score);
 
                 // Sorts the "highScores" list
                 highScores.Sort();
+
+                // Runs method that saves all High Scores
+                // in the High Scores file
+                SaveHighScores();
             }
         }
 
@@ -175,7 +176,7 @@ namespace LP2_P2
 
         /// <summary>
         /// Reads the "highScores" list and writes its values
-        /// on the High Scores file, separated by a "tab"
+        /// on the High Scores file
         /// </summary>
         public void SaveHighScores()
         {
@@ -185,8 +186,9 @@ namespace LP2_P2
             // Loops through each element of the "highScores" list
             foreach (Score hs in highScores)
 
-                // Writes the Names and TotalScores of each element
-                // of the "highScores" list on the High Scores File
+                // Writes the Names and TotalScores (separated by a 'tab')
+                // of each element of the "highScores" list
+                // on the High Scores file
                 sw.WriteLine(hs.Name + "\t" + hs.TotalScore);
         }
     }
