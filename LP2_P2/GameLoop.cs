@@ -67,6 +67,7 @@ namespace LP2_P2
             physicsObjects.Add(player);
             ConvertMapToDoubleArray();
             GenerateMap();
+            GeneratePickables();
 
             redGhost = new Ghost(12, 11, physicsObjects, 1, 1, 'R', 200);
             pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1, 'P', 200);
@@ -330,6 +331,32 @@ namespace LP2_P2
                         physicsObjects.Add(new DefaultObject(x, y,
                             mapVisuals[x, y], ObjectType.wall));
                     }
+                    // If the current char is a T creates a teleporter
+                    if (mapVisuals[x, y] == 'T')
+                    {
+                        // Creates and adds that Object to the list
+                        physicsObjects.Add(new DefaultObject(x, y,
+                            mapVisuals[x, y], ObjectType.teleporter));
+                    }
+                    // If the current char is empty creates an empty space
+                    if (mapVisuals[x, y] == ' ')
+                    {
+                        // Creates and Adds that Object to the list
+                        physicsObjects.Add(new DefaultObject(x, y,
+                            mapVisuals[x, y], ObjectType.emptySpace));
+                    }
+                }
+            }
+        }
+
+        private void GeneratePickables()
+        {
+            // Loop for the amount of lines in the char array
+            for (int y = 0; y < mapVisuals.GetLength(1); y++)
+            {
+                // Loop for the amount of characters in the char array
+                for (int x = 0; x < mapVisuals.GetLength(0); x++)
+                {
                     // If the current char is a . creates a Pellet
                     if (mapVisuals[x, y] == '.')
                     {
@@ -350,25 +377,12 @@ namespace LP2_P2
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new DefaultObject(x, y, 'F',
                             ObjectType.bonusFruit,
-                            Math.Min(100*level, 5000)));
-                    }
-                    // If the current char is a T creates a teleporter
-                    if (mapVisuals[x, y] == 'T')
-                    {
-                        // Creates and adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y,
-                            mapVisuals[x, y], ObjectType.teleporter));
-                    }
-                    // If the current char is empty creates an empty space
-                    if (mapVisuals[x, y] == ' ')
-                    {
-                        // Creates and Adds that Object to the list
-                        physicsObjects.Add(new DefaultObject(x, y,
-                            mapVisuals[x, y], ObjectType.emptySpace));
+                            Math.Min(100 * level, 5000)));
                     }
                 }
             }
         }
+
         /// <summary>
         /// Converts the string with the visuals to a double char array to be
         /// easier to acess and manipulate
@@ -526,9 +540,8 @@ namespace LP2_P2
                 level++;
                 // Clear list of physics objects, to generate the level again
                 // into that list
-                physicsObjects.Clear();
                 ConvertMapToDoubleArray();
-                GenerateMap();
+                GeneratePickables();
                 player.Pos = new Position(13, 17);
                 inputSys.ResetInput();
             }
