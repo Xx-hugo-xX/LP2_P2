@@ -80,7 +80,7 @@ namespace LP2_P2
         /// <param name="target"> The end position it should arrive </param>
         public void CalcuatePath(Object target)
         {
-            target = UpdateState(target);
+            target = UpdateTarget(target);
             // Clears the list to make sure they're empty before starting to
             // use them
             open.Clear();
@@ -186,6 +186,10 @@ namespace LP2_P2
             }
             // The path forms from end to start, so it needs to be reversed
             path.Reverse();
+
+            // Sets the position it should get from path to 0
+            counter = 0;
+
         }
 
         /// <summary>
@@ -206,27 +210,27 @@ namespace LP2_P2
         /// </summary>
         /// <param name="target"> The target given </param>
         /// <returns> A new target acording to the current state </returns>
-        private Object UpdateState(Object target)
+        private Object UpdateTarget(Object target)
         {
-            // if the ghost is in scatter mode
-            if (state == GhostState.scatter)
-                // the target is it's respective corner
-                target = corner;
-
             // if the ghost is frightened
             if (state == GhostState.frightened)
             {
                 // runs a while loop while the target is a wall or a Player
                 while (target.ObjType == ObjectType.player ||
-                    target.ObjType == ObjectType.player)
+                    target.ObjType == ObjectType.wall)
                 {
                     // Sets the target to be a random piece on the map
                     target = allPieces[rnd.Next(0, allPieces.Count)];
                 }
             }
 
+            // if the ghost is in scatter mode
+            else if (state == GhostState.scatter)
+                // the target is it's respective corner
+                target = corner;
+
             // if the ghost is eaten
-            if (state == GhostState.eaten)
+            else if (state == GhostState.eaten)
             {
                 // Checks if the ghost is already at the center
                 if (Pos == center.Pos)
@@ -235,6 +239,12 @@ namespace LP2_P2
                 else
                     // if not the target is the center piece
                     target = center;
+            }
+            // if the ghost is in his corner
+            if (Pos == corner.Pos)
+            {
+                // instead of stopping switches the target to centers
+                target = center;
             }
             // if it didn't enter any of the if statements it returns what was
             // passed as argument without changing it.
@@ -295,9 +305,6 @@ namespace LP2_P2
         /// </summary>
         public void UpdatePosition()
         {
-            // Sets the position it should get from path to 0
-            counter = 0;
-
             // Checks if the path has something in it
             if (path != null)
             {
@@ -321,8 +328,6 @@ namespace LP2_P2
                     counter = 0;
                 }
             }
-            // Updates the collider to be the same as the position
-            UpdatePhysics();
         }
     }
 }
