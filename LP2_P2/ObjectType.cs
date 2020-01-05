@@ -14,6 +14,7 @@ namespace LP2_P2
         pellet,
         bigPellet,
         bonusFruit,
-        target
+        target,
+        door,
     }
 }

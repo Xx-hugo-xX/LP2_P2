@@ -80,7 +80,7 @@ namespace LP2_P2
         /// <param name="target"> The end position it should arrive </param>
         public void CalcuatePath(Object target)
         {
-            target = UpdateState(target);
+            target = UpdateTarget(target);
             // Clears the list to make sure they're empty before starting to
             // use them
             open.Clear();
@@ -185,7 +185,8 @@ namespace LP2_P2
                 currentPiece = currentPiece.parent;
             }
             // The path forms from end to start, so it needs to be reversed
-            path.Reverse();        
+            path.Reverse();
+
             // Sets the position it should get from path to 0
             counter = 0;
 
@@ -209,8 +210,9 @@ namespace LP2_P2
         /// </summary>
         /// <param name="target"> The target given </param>
         /// <returns> A new target acording to the current state </returns>
-        private Object UpdateState(Object target)
+        private Object UpdateTarget(Object target)
         {
+            // if the ghost is frightened
             if (state == GhostState.frightened)
             {
                 // runs a while loop while the target is a wall or a Player
@@ -227,8 +229,6 @@ namespace LP2_P2
                 // the target is it's respective corner
                 target = corner;
 
-            // if the ghost is frightened
-
             // if the ghost is eaten
             else if (state == GhostState.eaten)
             {
@@ -239,6 +239,12 @@ namespace LP2_P2
                 else
                     // if not the target is the center piece
                     target = center;
+            }
+            // if the ghost is in his corner
+            if (Pos == corner.Pos)
+            {
+                // instead of stopping switches the target to centers
+                target = center;
             }
             // if it didn't enter any of the if statements it returns what was
             // passed as argument without changing it.
