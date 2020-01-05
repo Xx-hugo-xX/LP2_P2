@@ -6,6 +6,7 @@ namespace LP2_P2
 {
     public class InputSystem
     {
+        public bool IsRunning { get; private set; }
         public Direction Dir { get; private set; }
         public Direction LastDir { get; set; }
 
@@ -16,7 +17,12 @@ namespace LP2_P2
             inputCol = new BlockingCollection<ConsoleKey>();
             Dir = new Direction();
             LastDir = new Direction();
+            IsRunning = true;
+        }
 
+        public void CloseInputReading()
+        {
+            IsRunning = false;
         }
 
         public void ResetInput()
@@ -57,11 +63,13 @@ namespace LP2_P2
         public void ReadKeys()
         {
             ConsoleKey key;
-            do
+
+            IsRunning = true;
+            while(IsRunning)
             {
                 key = Console.ReadKey(true).Key;
                 inputCol.Add(key);
-            } while (key != ConsoleKey.Escape);
+            }
         }
     }
 }

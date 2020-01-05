@@ -10,7 +10,7 @@ namespace LP2_P2
         private readonly Player player;
         private readonly DoubleBuffer2D<char> db;
         private readonly InputSystem inputSys;
-        private readonly Thread keyReader;
+        private Thread keyReader;
 
         private readonly Ghost redGhost;
         private readonly Ghost pinkGhost;
@@ -21,7 +21,6 @@ namespace LP2_P2
         private readonly DefaultObject orangeTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
         private readonly DefaultObject blueTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
 
-        private bool running;
         private bool updateTimer = false;
         private int level;
         private int ghostUpdateTimer = 0;
@@ -84,8 +83,6 @@ namespace LP2_P2
 
             db = new DoubleBuffer2D<char>(30, 30);
             inputSys = new InputSystem();
-            keyReader = new Thread(inputSys.ReadKeys);
-            keyReader.Name = "InputThread";
 
             HSManager = hsManager;
 
@@ -94,19 +91,17 @@ namespace LP2_P2
 
         public void Loop()
         {
+            keyReader = new Thread(inputSys.ReadKeys);
+            keyReader.Name = "InputThread";
             keyReader.Start();
-            running = true;
-            while (running)
+            while (inputSys.IsRunning)
             {
-                long start = DateTime.Now.Ticks;
                 inputSys.ProcessInput();
                 Update(mapVisuals);
                 Render();
-                //Thread.Sleep(Math.Abs(
-                //    (int)(start / 20000)
-                //    + 20
-                //    - (int)(DateTime.Now.Ticks / 20000)));
             }
+            inputSys.ResetInput();
+            keyReader.Join(0);
         }
 
         public void Update(char[,] mapVisuals)
@@ -402,8 +397,8 @@ namespace LP2_P2
 
         private void KillPlayer()
         {
+            inputSys.CloseInputReading();
             HSManager.AddHighScore(player.plyrScore);
-            running = false;
         }
 
         /// <summary>

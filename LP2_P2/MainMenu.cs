@@ -1,24 +1,24 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace LP2_P2
 {
     public class MainMenu
     {
-        GameLoop Game { get; }
-        HighScoreManager HSManager { get; }
+        private GameLoop Game { get; set; }
+        private HighScoreManager HSManager { get; }
 
         public MainMenu()
         {
             HSManager = new HighScoreManager();
             HSManager.CreateFile();
-            Game = new GameLoop(HSManager);
         }
 
         public void RunMenu()
         {
-            ConsoleKey key;
-            do
+            ConsoleKey key = ConsoleKey.D0;
+            while(key != ConsoleKey.Q)
             {
                 Console.Clear();
                 Console.WriteLine("1. Play\n" +
@@ -29,6 +29,7 @@ namespace LP2_P2
                 switch (key)
                 {
                     case ConsoleKey.D1:
+                        Game = new GameLoop(HSManager);
                         Game.Loop();
                         break;
                     case ConsoleKey.D2:
@@ -41,7 +42,7 @@ namespace LP2_P2
                         Quit();
                         break;
                 }
-            } while (key != ConsoleKey.Q);
+            }
         }
 
         private void ShowHighScores()
