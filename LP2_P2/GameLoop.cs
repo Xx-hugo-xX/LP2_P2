@@ -22,6 +22,7 @@ namespace LP2_P2
 
         private bool running;
         private bool updateSwapTimer = false;
+        private int ghostUpdateTimer = 0;
         private int stateSwapTimer = DateTime.Now.Second;
         private int frightenTimer = DateTime.Now.Second;
 
@@ -164,7 +165,13 @@ namespace LP2_P2
                         }
                         break;
                 }
-                UpdateGhostBehaviour();
+                ghostUpdateTimer++;
+
+                if (ghostUpdateTimer > 5)
+                {
+                    UpdateGhostBehaviour();
+                    ghostUpdateTimer = 0;
+                }
             }
 
             // Updates the collider of the player to his current position
@@ -192,8 +199,8 @@ namespace LP2_P2
                             // Add picked up item's score value to player's score
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                         }
-
-                        else KillPlayer();
+                        else if (ghost.state != GhostState.eaten)
+                            KillPlayer();
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||
@@ -456,9 +463,6 @@ namespace LP2_P2
             UpdateGhostState(pinkGhost);
             UpdateGhostState(orangeGhost);
             UpdateGhostState(blueGhost);
-
-            //// Adds 1 to the state swaping timer
-            //stateSwapTimer++;
 
             // If the update timer bool is true (was queued)
             if (updateSwapTimer)
