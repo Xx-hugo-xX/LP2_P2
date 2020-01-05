@@ -43,7 +43,7 @@ namespace LP2_P2
         "     O.OO         OO.O     " +
         "     O.OO OOO OOO OO.O     " +
         "OOOOOO.OO O     O OO.OOOOOO" +
-        "T     .   O     O   .     T" +
+        "T......   O     O   ......T" +
         "OOOOOO.OO O     O OO.OOOOOO" +
         "     O.OO OOOOOOO OO.O     " +
         "     O.OO    F    OO.O     " +
@@ -57,7 +57,9 @@ namespace LP2_P2
         "O.........................O" +
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO";
 
-        public GameLoop()
+        public HighScoreManager HSManager;
+
+        public GameLoop(HighScoreManager hsManager)
         {
             level = 1;
             initialPlyrPos = new Position(13, 17);
@@ -84,6 +86,9 @@ namespace LP2_P2
             inputSys = new InputSystem();
             keyReader = new Thread(inputSys.ReadKeys);
             keyReader.Name = "InputThread";
+
+            HSManager = hsManager;
+
             Console.CursorVisible = false;
         }
 
@@ -192,6 +197,7 @@ namespace LP2_P2
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                             ghost.state = GhostState.eaten;
                         }
+                        else KillPlayer();
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||
@@ -225,6 +231,8 @@ namespace LP2_P2
                         player.Pos.X = player.Pos.X == 0 ? 26 : 1;
                     }
                 }
+
+                
             }
         }
 
@@ -390,6 +398,12 @@ namespace LP2_P2
                     }
                 }
             }
+        }
+
+        private void KillPlayer()
+        {
+            HSManager.AddHighScore(player.plyrScore);
+            running = false;
         }
 
         /// <summary>
