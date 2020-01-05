@@ -385,6 +385,12 @@ namespace LP2_P2
                     // If the current char is a B creates a BonusFruit
                     if (mapVisuals[x, y] == 'F')
                     {
+                        if (physicsObjects.Exists(obj => obj.ObjType ==
+                        ObjectType.bonusFruit))
+                        {
+                            physicsObjects.Remove(physicsObjects.Find(
+                                obj => obj.ObjType == ObjectType.bonusFruit));
+                        }
                         // Creates and adds that Object to the list
                         physicsObjects.Add(new DefaultObject(x, y, 'F',
                             ObjectType.bonusFruit,
@@ -535,8 +541,7 @@ namespace LP2_P2
             if (!physicsObjects.Exists(obj => obj.ObjType == ObjectType.pellet))
             {
                 level++;
-                // Clear list of physics objects, to generate the level again
-                // into that list
+                // Generate pickables again, 
                 ConvertMapToDoubleArray();
                 GeneratePickables();
                 player.Pos = new Position(13, 17);
