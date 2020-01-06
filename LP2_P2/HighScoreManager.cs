@@ -128,9 +128,12 @@ namespace LP2_P2
                     // Sets Score's Name based on user input
                     score.InsertName();
 
+                // Clears the console
+                Console.Clear();
+
                 // Tells the user that their score
                 // has been added to the High Scores
-                Console.WriteLine($"\nYour score of {score.TotalScore} was " +
+                Console.WriteLine($"Your score of {score.TotalScore} was " +
                     $"added to the High Scores!");
 
                 // Only let's user advance after he presses any key

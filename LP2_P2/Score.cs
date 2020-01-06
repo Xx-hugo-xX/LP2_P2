@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace LP2_P2
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class Score : IComparable<Score>
     {
         public string Name { get; private set; }
@@ -34,8 +31,7 @@ namespace LP2_P2
             int maxLength = 3;
             List<char> name = new List<char>();
 
-            bool valid = false;
-            while (!valid)
+            while (true)
             {
                 Console.Clear();
                 Console.WriteLine("New High Score! " +
@@ -52,11 +48,11 @@ namespace LP2_P2
 
                 else if (name.Count < maxLength &&
                     char.IsLetter(keyInfo.KeyChar) && keyInfo.KeyChar != 'º')
-                        name.Add(char.ToUpper(keyInfo.KeyChar));
+                    name.Add(char.ToUpper(keyInfo.KeyChar));
 
                 else if (name.Count == maxLength &&
                     keyInfo.Key == ConsoleKey.Enter)
-                        valid = true;
+                    break;
             }
 
             Name = new string(name.ToArray());
