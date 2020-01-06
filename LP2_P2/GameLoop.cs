@@ -103,139 +103,22 @@ namespace LP2_P2
 
         public void Update(char[,] mapVisuals)
         {
+            // Checks for level finish (all pellets collected) and passes
+            // to the next level if the conditions are met, generating the
+            // map and pickables again and resets the player's position
             CheckForLevelFinish();
-
-            if (inputSys.Dir != Direction.None)
-            {
-                Object wallDetection;
-                player.OldPos.X = player.Pos.X;
-                player.OldPos.Y = player.Pos.Y;
-
-                switch (inputSys.Dir)
-                {
-                    case Direction.Up:
-                        wallDetection = col.Collision(player, 0, -1);
-                        // Checks if the next position up is not a wall
-                        if (wallDetection == null || wallDetection.ObjType
-                            != ObjectType.wall && wallDetection.ObjType
-                            != ObjectType.door)
-                        {
-                            // Decreases the y of the player by 1
-                            player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
-                            inputSys.LastDir = inputSys.Dir;
-                        }
-                        break;
-
-                    case Direction.Left:
-                        wallDetection = col.Collision(player, -1, 0);
-                        // Checks if the next position left is not a wall
-                        if (wallDetection == null || wallDetection.ObjType
-                            != ObjectType.wall && wallDetection.ObjType
-                            != ObjectType.door)
-                        {
-                            // Decreases the x of the player by 1
-                            player.Pos.X = Math.Max(0, player.Pos.X - 1);
-                            inputSys.LastDir = inputSys.Dir;
-                        }
-                        break;
-
-                    case Direction.Down:
-                        wallDetection = col.Collision(player, 0, 1);
-                        // Checks if the next position down is not a wall
-                        if (wallDetection == null || wallDetection.ObjType
-                            != ObjectType.wall && wallDetection.ObjType
-                            != ObjectType.door)
-                        {
-                            // Increases the y of the player by 1
-                            player.Pos.Y =
-                                Math.Min(db.YDim - 1, player.Pos.Y + 1);
-                            inputSys.LastDir = inputSys.Dir;
-                        }
-                        break;
-
-                    case Direction.Right:
-                        wallDetection = col.Collision(player, 1, 0);
-                        // Checks if the next position right is not a wall
-                        if (wallDetection == null || wallDetection.ObjType
-                            != ObjectType.wall && wallDetection.ObjType
-                            != ObjectType.door)
-                        {
-                            // Increases the X of the player by 1
-                            player.Pos.X =
-                                Math.Min(db.XDim - 1, player.Pos.X + 1);
-                            inputSys.LastDir = inputSys.Dir;
-                        }
-                        break;
-                }
-                UpdateGhostBehaviour();
-            }
-
+            // Updates the player's direction
+            UpdatePlayerDirection();
             // Updates the collider of the player to his current position
             player.UpdatePhysics();
-
-            // Updates the collider of the Ghosts to their current position
+            // Updates the colliders of the Ghosts to their current position
             redGhost.UpdatePhysics();
             pinkGhost.UpdatePhysics();
             orangeGhost.UpdatePhysics();
             blueGhost.UpdatePhysics();
-
-            List<Object> obj = col.Collision(player);
-
-            if (obj != null)
-            {
-                for (int i = 0; i < obj.Count; i++)
-                {
-                    if (obj[i].ObjType == ObjectType.ghost)
-                    {
-                        Ghost ghost = obj[i] as Ghost;
-                        if (ghost.state == GhostState.frightened)
-                        {
-                            ghost.state = GhostState.eaten;
-
-                            // Add picked up item's score value to player's score
-                            player.plyrScore.AddScore(obj[i].ScoreVal);
-                        }
-
-                        else player.Death(inputSys, HSManager);
-                    }
-                    // Checks if the player is on a Pellet
-                    if (obj[i].ObjType == ObjectType.pellet ||
-                            obj[i].ObjType == ObjectType.bigPellet ||
-                            obj[i].ObjType == ObjectType.bonusFruit)
-                    {
-                        if (obj[i].ObjType == ObjectType.bigPellet)
-                        {
-                            redGhost.state = GhostState.frightened;
-                            pinkGhost.state = GhostState.frightened;
-                            orangeGhost.state = GhostState.frightened;
-                            blueGhost.state = GhostState.frightened;
-
-                            frightenTimer = DateTime.Now.Second;
-                        }
-
-                        physicsObjects[physicsObjects.IndexOf(obj[i])] =
-                            new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
-                            ObjectType.emptySpace);
-
-                        // Updates visual for position player was in if there was a
-                        // a pickable on it
-                        mapVisuals[obj[i].Pos.X, obj[i].Pos.Y] = ' ';
-
-                        // Add picked up item's score value to player's score
-                        player.plyrScore.AddScore(obj[i].ScoreVal);
-                    }
-                    // Checks if the player is on a Teleporter
-                    if (obj[i].ObjType == ObjectType.teleporter)
-                    {
-                        // If his postition is 0 teleports him to 26 else teleports him
-                        // to 1
-                        player.Pos.X = player.Pos.X == 0 ?
-                            mapVisuals.GetLength(0) - 2 : 1;
-                    }
-                }
-
-                
-            }
+            // Checks for collisions and executes the logic of the interactions
+            // of the player with other objects
+            CheckForCollisions();
         }
 
         public void Render()
@@ -436,6 +319,144 @@ namespace LP2_P2
                 }
             }
         }
+        /// <summary>
+        /// Updates the player's Direction using the Dir variable of inputSys
+        /// and updates the Ghost's behaviour in return if inputSys.Dir is 
+        /// different than Direction.None
+        /// </summary>
+        private void UpdatePlayerDirection()
+        {
+            // if statement that checks if the Dir variable's value is not
+            // Direction.None
+            if (inputSys.Dir != Direction.None)
+            {
+                Object wallDetection;
+                player.OldPos.X = player.Pos.X;
+                player.OldPos.Y = player.Pos.Y;
+
+                switch (inputSys.Dir)
+                {
+                    case Direction.Up:
+                        wallDetection = col.Collision(player, 0, -1);
+                        // Checks if the next position up is not a wall
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall && wallDetection.ObjType
+                            != ObjectType.door)
+                        {
+                            // Decreases the y of the player by 1
+                            player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
+                            inputSys.LastDir = inputSys.Dir;
+                        }
+                        break;
+
+                    case Direction.Left:
+                        wallDetection = col.Collision(player, -1, 0);
+                        // Checks if the next position left is not a wall
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall && wallDetection.ObjType
+                            != ObjectType.door)
+                        {
+                            // Decreases the x of the player by 1
+                            player.Pos.X = Math.Max(0, player.Pos.X - 1);
+                            inputSys.LastDir = inputSys.Dir;
+                        }
+                        break;
+
+                    case Direction.Down:
+                        wallDetection = col.Collision(player, 0, 1);
+                        // Checks if the next position down is not a wall
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall && wallDetection.ObjType
+                            != ObjectType.door)
+                        {
+                            // Increases the y of the player by 1
+                            player.Pos.Y =
+                                Math.Min(db.YDim - 1, player.Pos.Y + 1);
+                            inputSys.LastDir = inputSys.Dir;
+                        }
+                        break;
+
+                    case Direction.Right:
+                        wallDetection = col.Collision(player, 1, 0);
+                        // Checks if the next position right is not a wall
+                        if (wallDetection == null || wallDetection.ObjType
+                            != ObjectType.wall && wallDetection.ObjType
+                            != ObjectType.door)
+                        {
+                            // Increases the X of the player by 1
+                            player.Pos.X =
+                                Math.Min(db.XDim - 1, player.Pos.X + 1);
+                            inputSys.LastDir = inputSys.Dir;
+                        }
+                        break;
+                }
+                UpdateGhostBehaviour();
+            }
+        }
+        /// <summary>
+        /// Checks for player's collisions with other objects and, in case
+        /// anything happens upon the colision, realises the interaction's
+        /// logic
+        /// </summary>
+        private void CheckForCollisions()
+        {
+            List<Object> obj = col.Collision(player);
+
+            if (obj != null)
+            {
+                for (int i = 0; i < obj.Count; i++)
+                {
+                    if (obj[i].ObjType == ObjectType.ghost)
+                    {
+                        Ghost ghost = obj[i] as Ghost;
+                        if (ghost.state == GhostState.frightened)
+                        {
+                            ghost.state = GhostState.eaten;
+                    
+                            // Add picked up item's score value to player's score
+                            player.plyrScore.AddScore(obj[i].ScoreVal);
+                        }
+                    
+                        else player.Death(inputSys, HSManager);
+                    }
+                    // Checks if the player is on a Pellet
+                    if (obj[i].ObjType == ObjectType.pellet ||
+                            obj[i].ObjType == ObjectType.bigPellet ||
+                            obj[i].ObjType == ObjectType.bonusFruit)
+                    {
+                        if (obj[i].ObjType == ObjectType.bigPellet)
+                        {
+                            redGhost.state = GhostState.frightened;
+                            pinkGhost.state = GhostState.frightened;
+                            orangeGhost.state = GhostState.frightened;
+                            blueGhost.state = GhostState.frightened;
+
+                            frightenTimer = DateTime.Now.Second;
+                        }
+
+                        physicsObjects[physicsObjects.IndexOf(obj[i])] =
+                            new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
+                            ObjectType.emptySpace);
+
+                        // Updates visual for position player was in if there was a
+                        // a pickable on it
+                        mapVisuals[obj[i].Pos.X, obj[i].Pos.Y] = ' ';
+
+                        // Add picked up item's score value to player's score
+                        player.plyrScore.AddScore(obj[i].ScoreVal);
+                    }
+                    // Checks if the player is on a Teleporter
+                    if (obj[i].ObjType == ObjectType.teleporter)
+                    {
+                        // If his postition is 0 teleports him to 26 else teleports him
+                        // to 1
+                        player.Pos.X = player.Pos.X == 0 ?
+                            mapVisuals.GetLength(0) - 2 : 1;
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Updates the state of the ghost acording to a timer or a collision
         /// </summary>
