@@ -196,7 +196,7 @@ namespace LP2_P2
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                         }
 
-                        else player.KillPlayer(inputSys, HSManager);
+                        else player.Death(inputSys, HSManager);
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||

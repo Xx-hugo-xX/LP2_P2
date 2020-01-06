@@ -28,7 +28,7 @@ namespace LP2_P2
             plyrScore = new Score();
         }
 
-        public void KillPlayer(InputSystem inputSys, HighScoreManager HSManager)
+        public void Death(InputSystem inputSys, HighScoreManager HSManager)
         {
             inputSys.CloseInputReading();
 
