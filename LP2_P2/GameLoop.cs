@@ -138,58 +138,94 @@ namespace LP2_P2
             // Puts the player position on the buffer
             db[player.Pos.X, player.Pos.Y] = player.Visuals;
 
+            // Sets the visuals of the various ghosts according to their
+            // current states
             SetBufferGhostVisuals(redGhost);
             SetBufferGhostVisuals(pinkGhost);
             SetBufferGhostVisuals(orangeGhost);
             SetBufferGhostVisuals(blueGhost);
 
+            // Swap the current frame for the next frame of the DoubleBuffer
             db.Swap();
 
+            // Update objects displayed
+            // Loop throught the doublebuffers YDim, starting at 0
             for (int y = 0; y < db.YDim; y++)
             {
+                // Loop throught the doublebuffers XDim, starting at 0
                 for (int x = 0; x < db.XDim; x++)
                 {
+                    // Sets ForegroundColor to White
                     Console.ForegroundColor = ConsoleColor.White;
 
+                    // if statement that checks if the char in the specified
+                    // position of the doublebuffer is 'O'
                     if (db[x, y] == 'O')
                     {
+                        // Sets BackgroundColor to DarkBlue
                         Console.BackgroundColor = ConsoleColor.DarkBlue;
+                        // Sets ForegroundColor to DarkBlue
                         Console.ForegroundColor = ConsoleColor.DarkBlue;
                     }
+                    // else if statement that checks if the char in the 
+                    // specified position of the doublebuffer is 'O'
                     else if (db[x, y] == 'C')
                     {
+                        // Sets ForegroundColor to DarkYellow
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                     }
+                    // else if statement that checks if the char in the 
+                    // specified position of the doublebuffer is 'O'
                     else if (db[x, y] == 'f')
                     {
+                        // Sets BackgroundColor to Cyan
                         Console.BackgroundColor = ConsoleColor.Cyan;
                     }
+                    // else if statement that checks if the char in the 
+                    // specified position of the doublebuffer is 'O'
                     else if (db[x, y] == 'R')
                     {
+                        // Sets BackgroundColor to DarkRed
                         Console.BackgroundColor = ConsoleColor.DarkRed;
                     }
+                    // else if statement that checks if the char in the 
+                    // specified position of the doublebuffer is 'O'
                     else if (db[x, y] == 'P')
                     {
+                        // Sets BackgroundColor to Magenta
                         Console.BackgroundColor = ConsoleColor.Magenta;
                     }
+                    // else if statement that checks if the char in the 
+                    // specified position of the doublebuffer is 'O'
                     else if (db[x, y] == 'G')
                     {
+                        // Sets BackgroundColor to Red
                         Console.BackgroundColor = ConsoleColor.Red;
                     }
+                    // else if statement that checks if the char in the 
+                    // specified position of the doublebuffer is 'O'
                     else if (db[x, y] == 'B')
                     {
+                        // Sets BackgroundColor to Blue
                         Console.BackgroundColor = ConsoleColor.Blue;
                     }
+                    // else if statement that checks if the char in the 
+                    // specified position of the doublebuffer is 'O'
                     else if (db[x, y] == 'T')
                     {
+                        // Sets ForegroundColor to Black
                         Console.ForegroundColor = ConsoleColor.Black;
                     }
+                    // Writes the doublebuffer's current char of index x and y
                     Console.Write(db[x, y]);
+                    // Reset the console's color
                     Console.ResetColor();
                 }
                 Console.Write('\n');
             }
+            // Sets CursorPosition to 0 in x and 0 in y
             Console.SetCursorPosition(0, 0);
+            // Clears the doublebuffer
             db.Clear();
         }
         /// <summary>
@@ -214,7 +250,7 @@ namespace LP2_P2
         }
         /// <summary>
         /// Assembles the map by creating the necessary things and adding them
-        /// to a list
+        /// to the physicsObjects list
         /// </summary>
         private void GenerateMap()
         {
@@ -255,7 +291,10 @@ namespace LP2_P2
                 }
             }
         }
-
+        /// <summary>
+        /// Generates the pickables to be placed in the map and adding them to
+        /// the physicsObjects list
+        /// </summary>
         private void GeneratePickables()
         {
             // Loop for the amount of lines in the char array
@@ -330,41 +369,62 @@ namespace LP2_P2
             // Direction.None
             if (inputSys.Dir != Direction.None)
             {
+                // Declare wallDetection object, used to determine if the
+                // position the player is trying to move to is occupied by a
+                // wall or a door
                 Object wallDetection;
+                // Update player.OldPos.X, assigning player.Pos.X to it
                 player.OldPos.X = player.Pos.X;
+                // Update player.OldPos.Y, assigning player.Pos.Y to it
                 player.OldPos.Y = player.Pos.Y;
 
+                // switch statement that determines the position the player
+                // will attempt to move to based on the inputSys.Dir variable
                 switch (inputSys.Dir)
                 {
+                    // In case Direction.Up
                     case Direction.Up:
+                        // Assigns value returned by col.Collision of the
+                        // position desired to wall detection
                         wallDetection = col.Collision(player, 0, -1);
-                        // Checks if the next position up is not a wall
+                        // Checks if the next position left is not a wall
+                        // or a door
                         if (wallDetection == null || wallDetection.ObjType
                             != ObjectType.wall && wallDetection.ObjType
                             != ObjectType.door)
                         {
                             // Decreases the y of the player by 1
                             player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
+                            // Assigns the value of inputSys.Dir to
+                            // inputSys.LastDir
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
-
+                    // In case Direction.Left
                     case Direction.Left:
+                        // Assigns value returned by col.Collision of the
+                        // position desired to wall detection
                         wallDetection = col.Collision(player, -1, 0);
                         // Checks if the next position left is not a wall
+                        // or a door
                         if (wallDetection == null || wallDetection.ObjType
                             != ObjectType.wall && wallDetection.ObjType
                             != ObjectType.door)
                         {
                             // Decreases the x of the player by 1
                             player.Pos.X = Math.Max(0, player.Pos.X - 1);
+                            // Assigns the value of inputSys.Dir to
+                            // inputSys.LastDir
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
-
+                    // In case Direction.Down
                     case Direction.Down:
+                        // Assigns value returned by col.Collision of the
+                        // position desired to wall detection
                         wallDetection = col.Collision(player, 0, 1);
-                        // Checks if the next position down is not a wall
+                        // Checks if the next position left is not a wall
+                        // or a door
                         if (wallDetection == null || wallDetection.ObjType
                             != ObjectType.wall && wallDetection.ObjType
                             != ObjectType.door)
@@ -372,13 +432,18 @@ namespace LP2_P2
                             // Increases the y of the player by 1
                             player.Pos.Y =
                                 Math.Min(db.YDim - 1, player.Pos.Y + 1);
+                            // Assigns the value of inputSys.Dir to
+                            // inputSys.LastDir
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
-
+                    // In case Direction.Right
                     case Direction.Right:
+                        // Assigns value returned by col.Collision of the
+                        // position desired to wall detection
                         wallDetection = col.Collision(player, 1, 0);
-                        // Checks if the next position right is not a wall
+                        // Checks if the next position left is not a wall
+                        // or a door
                         if (wallDetection == null || wallDetection.ObjType
                             != ObjectType.wall && wallDetection.ObjType
                             != ObjectType.door)
@@ -386,10 +451,13 @@ namespace LP2_P2
                             // Increases the X of the player by 1
                             player.Pos.X =
                                 Math.Min(db.XDim - 1, player.Pos.X + 1);
+                            // Assigns the value of inputSys.Dir to
+                            // inputSys.LastDir
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
                 }
+                // Updates the ghosts' behaviours
                 UpdateGhostBehaviour();
             }
         }
@@ -495,7 +563,7 @@ namespace LP2_P2
         /// </summary>
         private void UpdateGhostBehaviour()
         {
-            // Checks if the current state of the passed ghost needs to be
+            // Checks if the current state of the passed ghosts needs to be
             // changed
             UpdateGhostState(redGhost);
             UpdateGhostState(pinkGhost);
