@@ -126,7 +126,7 @@ namespace LP2_P2
                 if (score.Name == default)
 
                     // Sets Score's Name based on user input
-                    score.InsertName(SetPlayerName());
+                    score.InsertName(SetHighScoreName());
 
                 // Clears the console
                 Console.Clear();
@@ -201,7 +201,7 @@ namespace LP2_P2
         /// </summary>
         /// <returns>Returns a string with the name the
         /// player chose fo the HighScores file</returns>
-        private string SetPlayerName()
+        private string SetHighScoreName()
         {
             // Sets the maximum number of characters the name can have
             int maxLength = 3;
