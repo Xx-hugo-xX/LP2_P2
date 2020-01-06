@@ -3,11 +3,22 @@ using System.IO;
 
 namespace LP2_P2
 {
+    /// <summary>
+    /// Class responsible for creating and handling the MainMenu and it's logic
+    /// </summary>
     public class MainMenu
     {
+        // Declare a private property of type GameLoop, responsible for calling
+        // the game loop
         private GameLoop Game { get; set; }
+        // Declare a private property of type HighScoreManager, responsible for
+        // handling score related logic
         private HighScoreManager HSManager { get; }
-
+        /// <summary>
+        /// Class constructor with no parameters, initializing a new 
+        /// HighScoreManager class instance and assigning it to the
+        /// HSManager property
+        /// </summary>
         public MainMenu()
         {
             // Instantiates the instance of 'HighScoreManager'
@@ -19,7 +30,10 @@ namespace LP2_P2
             // a new file, if the user doesn't already have it 
             HSManager.CreateFile();
         }
-
+        /// <summary>
+        /// The Main Menu where the user can start the game, show the high
+        /// scores, show the controls or quit the game
+        /// </summary>
         public void RunMenu()
         {
             // Declares new ConsoleKey variable and instantiates it as default 
@@ -81,7 +95,10 @@ namespace LP2_P2
                 }
             }
         }
-
+        /// <summary>
+        /// Private method that parses the information in the HighScores file
+        /// and displays them to the player
+        /// </summary>
         private void ShowHighScores()
         {
             // Opens a StreamReader with the HighScores file
@@ -119,8 +136,10 @@ namespace LP2_P2
             // Asks for user input before exiting the method
             Console.ReadKey(true);
         }
-
-        public void ShowControls()
+        /// <summary>
+        /// Private method that displays the controls to the player
+        /// </summary>
+        private void ShowControls()
         {
             // Clears the console
             Console.Clear();
@@ -134,7 +153,9 @@ namespace LP2_P2
             // Asks for user input before exiting the method
             Console.ReadKey(true);
         }
-
+        /// <summary>
+        /// Private method that quits the game
+        /// </summary>
         private void Quit()
         {
             // Clears the console
