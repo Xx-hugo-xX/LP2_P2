@@ -57,36 +57,9 @@ namespace LP2_P2
         }
         
         // ---------------------------DO XML LATER-----------------------------
-        public void InsertName()
+        public void InsertName(string name)
         {
-            int maxLength = 3;
-            List<char> name = new List<char>();
-
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine("New High Score! " +
-                        "What should we call you?\n");
-
-
-                for (int i = 0; i < name.Count; i++)
-                    Console.Write(name[i]);
-
-                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-
-                if (name.Count > 0 && keyInfo.Key == ConsoleKey.Backspace)
-                    name.RemoveAt(name.Count - 1);
-
-                else if (name.Count < maxLength &&
-                    char.IsLetter(keyInfo.KeyChar) && keyInfo.KeyChar != 'º')
-                    name.Add(char.ToUpper(keyInfo.KeyChar));
-
-                else if (name.Count == maxLength &&
-                    keyInfo.Key == ConsoleKey.Enter)
-                    break;
-            }
-
-            Name = new string(name.ToArray());
+            Name = name;
         }
         /// <summary>
         /// Public method that compares the instance by which it is called with

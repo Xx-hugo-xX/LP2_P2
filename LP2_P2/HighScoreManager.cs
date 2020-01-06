@@ -126,7 +126,7 @@ namespace LP2_P2
                 if (score.Name == default)
 
                     // Sets Score's Name based on user input
-                    score.InsertName();
+                    score.InsertName(SetPlayerName());
 
                 // Clears the console
                 Console.Clear();
@@ -155,7 +155,8 @@ namespace LP2_P2
         /// Checks if the given score is to be added to the "highScores" list
         /// </summary>
         /// <param name="score">Score that will be analyzed</param>
-        /// <returns></returns>
+        /// <returns>Returns a boolean that defines if the analyzed score
+        /// is a HighScore or not</returns>
         private bool IsHighScore(Score score)
         {
             // Returns true if the "highScores" list has less
@@ -193,6 +194,67 @@ namespace LP2_P2
                 // of each element of the "highScores" list
                 // on the High Scores file
                 sw.WriteLine(hs.Name + "\t" + hs.TotalScore);
+        }
+
+        /// <summary>
+        /// Asks the player for a name to save for the HighScores file
+        /// </summary>
+        /// <returns>Returns a string with the name the
+        /// player chose fo the HighScores file</returns>
+        private string SetPlayerName()
+        {
+            // Sets the maximum number of characters the name can have
+            int maxLength = 3;
+
+            // Declares and instantiates a list of chars that
+            // will save each valid char the user inputs
+            List<char> name = new List<char>();
+
+            // Loops until the conditions have been met
+            while (true)
+            {
+                // Clears the console
+                Console.Clear();
+                // Writes a message asking for the player to input a name
+                Console.WriteLine("New High Score! " +
+                        "What should we call you?\n");
+
+                // Loops until 'i' is equal to the number
+                // of chars in the variable 'name'
+                for (int i = 0; i < name.Count; i++)
+                    // Writes each value already in the variable 'name'
+                    Console.Write(name[i]);
+
+                // Sets new ConsoleKeyInfo variable based on user input 
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+                // Checks if the 'name' list of chars is not empty
+                // and the variable 'keyInfo'.Key is the Backspace key
+                if (name.Count > 0 && keyInfo.Key == ConsoleKey.Backspace)
+                    // Removes the last char in the 'name' list of chars
+                    name.RemoveAt(name.Count - 1);
+
+                // Checks if the number of chars in the 'name' list is less
+                // than the 'maxLength' variable, if the variable
+                // 'keyInfo'.KeyChar is a letter, and if the variable
+                // 'keyInfo'.KeyChar is diiferent than 'º' 
+                else if (name.Count < maxLength &&
+                    char.IsLetter(keyInfo.KeyChar) && keyInfo.KeyChar != 'º')
+                    // Sets the variable 'keyInfo'.KeyChar to UpperCase
+                    // and adds it to the 'name' list of chars
+                    name.Add(char.ToUpper(keyInfo.KeyChar));
+
+                // Checks if the number of chars in the 'name'
+                // list is equal to the 'maxLength' variable, and
+                // if the the variable 'keyInfo'.Key is Enter key
+                else if (name.Count == maxLength &&
+                    keyInfo.Key == ConsoleKey.Enter)
+                    // Leaves the current loop
+                    break;
+            }
+            // Returns a new string formed by the
+            // 'name' list transformed in an array
+            return new string(name.ToArray());
         }
     }
 }
