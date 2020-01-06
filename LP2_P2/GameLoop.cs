@@ -6,7 +6,6 @@ namespace LP2_P2
 {
     public class GameLoop
     {
-        private Position initialPlyrPos;
         private readonly Player player;
         private readonly DoubleBuffer2D<char> db;
         private readonly InputSystem inputSys;
@@ -62,7 +61,6 @@ namespace LP2_P2
         public GameLoop(HighScoreManager hsManager)
         {
             level = 1;
-            initialPlyrPos = new Position(13, 17);
             player = new Player();
 
             physicsObjects.Add(player);
@@ -198,7 +196,7 @@ namespace LP2_P2
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                         }
 
-                        else KillPlayer();
+                        else player.KillPlayer(inputSys, HSManager);
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||
@@ -413,12 +411,6 @@ namespace LP2_P2
                     }
                 }
             }
-        }
-
-        private void KillPlayer()
-        {
-            inputSys.CloseInputReading();
-            HSManager.AddHighScore(player.plyrScore);
         }
 
         /// <summary>

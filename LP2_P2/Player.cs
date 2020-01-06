@@ -1,4 +1,6 @@
-﻿namespace LP2_P2
+﻿using System;
+
+namespace LP2_P2
 {
     /// <summary>
     /// Creates a Player to be used by the user
@@ -24,6 +26,17 @@
             BoxCollider = new int[4] { 0, 0, 0 + 1, 0 + 1 };
             // Sets the value to a new Score class
             plyrScore = new Score();
+        }
+
+        public void KillPlayer(InputSystem inputSys, HighScoreManager HSManager)
+        {
+            inputSys.CloseInputReading();
+
+            Console.Clear();
+            Console.WriteLine("Game Over!");
+            Console.ReadKey(true);
+
+            HSManager.AddHighScore(plyrScore);
         }
     }
 }
