@@ -78,7 +78,7 @@ namespace LP2_P2
         /// A* algorithm for searching the bes path to a position
         /// </summary>
         /// <param name="target"> The end position it should arrive </param>
-        public void CalcuatePath(Object target)
+        public void CalculatePath(Object target)
         {
             target = UpdateTarget(target);
             // Clears the list to make sure they're empty before starting to

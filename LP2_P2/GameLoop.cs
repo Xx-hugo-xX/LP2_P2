@@ -531,10 +531,10 @@ namespace LP2_P2
                 (player.Pos.Y - redGhost.Pos.Y) + player.Pos.Y)));
 
             // Calculates the path of the ghost giving it a target
-            pinkGhost.CalcuatePath(pinkTarget);
-            redGhost.CalcuatePath(player);
-            orangeGhost.CalcuatePath(orangeTarget);
-            blueGhost.CalcuatePath(blueTarget);
+            pinkGhost.CalculatePath(pinkTarget);
+            redGhost.CalculatePath(player);
+            orangeGhost.CalculatePath(orangeTarget);
+            blueGhost.CalculatePath(blueTarget);
 
             // Updates the current position and the colider of the
             // ghost acording to the path calculates above
