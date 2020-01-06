@@ -23,7 +23,9 @@ namespace LP2_P2
         /// </summary>
         public Score()
         {
+            // Assign default string value to Name property
             Name = default;
+            // Assign int value 0 to TotalScore property
             TotalScore = 0;
         }
         /// <summary>
@@ -35,7 +37,11 @@ namespace LP2_P2
         /// <param name="score"> The score given </param>
         public Score(string name, int score)
         {
+            // Assign the value of the string name, given as a parameter to the
+            // Name property
             Name = name;
+            // Assign the value of the int score, given as a parameter to the
+            // TotalScore property
             TotalScore = score;
         }
         /// <summary>
