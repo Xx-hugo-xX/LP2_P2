@@ -32,11 +32,6 @@ namespace LP2_P2
             for (int i = 0; i < inputCol.Count; i++) inputCol.Take();
         }
 
-        public void SetDirection(Direction dir)
-        {
-            Dir = dir;
-        }
-
         public void ProcessInput()
         {
             if (inputCol.TryTake(out ConsoleKey key))
