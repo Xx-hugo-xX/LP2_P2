@@ -736,6 +736,7 @@ namespace LP2_P2
                 // Generate all pickables
                 GeneratePickables();
                 // Spawn ghosts into their initial positions
+                SpawnGhosts();
                 // Reset player's position
                 player.Pos = new Position(13, 17);
                 // Reset all input, as to have a clean slate for the new level
