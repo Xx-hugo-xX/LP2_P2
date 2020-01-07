@@ -190,7 +190,14 @@ namespace LP2_P2
             // of the player with other objects
             CheckForCollisions();
         }
-
+        /// <summary>
+        /// Loops through the mapVisuals two dimensional char array and
+        /// assigns the visuals to the DoubleBuffer's next frame, swaps the
+        /// current frame for the next and displays, and runs another loop
+        /// through the doublebuffer, checking various possible objects in a 
+        /// position and changing the console's background and/or foreground 
+        /// colours according to the char read, then writes it.
+        /// </summary>
         public void Render()
         {
             Console.WriteLine($"{player.plyrScore}\t\tLevel: {level}");
@@ -300,7 +307,7 @@ namespace LP2_P2
         }
         /// <summary>
         /// Changes the visuals of the ghosts will appear acording to their
-        /// state
+        /// state.
         /// </summary>
         /// <param name="ghost"> The current ghost being checked </param>
         private void SetBufferGhostVisuals(Ghost ghost)
@@ -715,21 +722,27 @@ namespace LP2_P2
             blueGhost.UpdatePosition();
         }
 
-        // Increments level number, clears physicsObjects list,
-        // generates the map again, while keeping player's score, places player
-        // back in his starting position and resets input
+
+        /// <summary>
+        /// Increments level number generates pickables again, while keeping 
+        /// player's score, places the player back in his starting position 
+        /// and resets input.
+        /// </summary>
         private void CheckForLevelFinish()
         {
+            // if statement that checks if any objects of type pellet exist
+            // in the physicsObjects list
             if (!physicsObjects.Exists(obj => obj.ObjType == ObjectType.pellet))
             {
+                // Increment level number
                 level++;
-                // Clear list of physics objects, to generate the level again
-                // into that list
-                physicsObjects.Clear();
+                // Convert map string to double array
                 ConvertMapToDoubleArray();
-                GenerateMap();
+                // Generate all pickables
                 GeneratePickables();
+                // Reset player's position
                 player.Pos = new Position(13, 17);
+                // Reset all input, as to have a clean slate for the new level
                 inputSys.ResetInput();
             }
         }
