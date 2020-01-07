@@ -94,6 +94,9 @@ namespace LP2_P2
             // Creates and adds the Objects needed to form the map
             GenerateMap();
 
+            // Generate map's pickables and add then to the physicsObjects list
+            GeneratePickables();
+
             // Creates a new Player
             player = new Player();
 
@@ -122,9 +125,11 @@ namespace LP2_P2
             // Creates a new Input System
             inputSys = new InputSystem();
             // Creates a new Thread and gives it a method of InputSystem
-            keyReader = new Thread(inputSys.ReadKeys);
-            // Assign a name to the Input Thread
-            keyReader.Name = "InputThread";
+            keyReader = new Thread(inputSys.ReadKeys)
+            {
+                // Assign a name to the Input Thread
+                Name = "InputThread"
+            };
 
             // Equals this HighScoreManager to the one given
             HSManager = hsManager;
