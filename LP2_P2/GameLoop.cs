@@ -743,7 +743,9 @@ namespace LP2_P2
                 inputSys.ResetInput();
             }
         }
-
+        /// <summary>
+        /// Creates the 4 ghosts at the center of the map
+        /// </summary>
         private void SpawnGhosts()
         {
             // Creates the 4 ghosts at the center position passing through
