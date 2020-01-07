@@ -25,7 +25,8 @@ namespace LP2_P2
         private readonly DefaultObject corner;
 
         // Creates a EmptyPiece to be used as target if eaten
-        private readonly DefaultObject center = new DefaultObject(13, 7, ' ', ObjectType.target);
+        private readonly DefaultObject center = new DefaultObject(13, 7, ' ', 
+            ObjectType.target);
 
         // Stores the state the ghosts are currently in
         public GhostState state;
@@ -134,14 +135,15 @@ namespace LP2_P2
                     // Checks if the Object is already in the locked path
                     if (!closed.Contains(neighbors[b]))
                     {
-                        // Local variable combining the distance to the start and
-                        // the distance between the current position and that
-                        // neibhor
+                        // Local variable combining the distance to the start 
+                        // and the distance between the current position and
+                        // that neighbor
                         int newCostMov = current.distanceCost +
                             GetDistace(current.Pos, neighbors[b].Pos);
 
                         // Checks if that variable is lower than the current
-                        // distance of the Object and open list doesn't contain it
+                        // distance of the Object and open list doesn't contain
+                        // it
                         if (newCostMov < neighbors[b].distanceCost
                             || !open.Contains(neighbors[b]))
                         {
@@ -150,7 +152,8 @@ namespace LP2_P2
                             // Sets a new closeness to that neighbor
                             neighbors[b].closenessCost =
                                 GetDistace(neighbors[b].Pos, target.Pos);
-                            // Sets the parent of that neighbor the current object
+                            // Sets the parent of that neighbor the current
+                            // object
                             neighbors[b].parent = current;
                             // Adds that neighbor to the open list
                             open.Add(neighbors[b]);
