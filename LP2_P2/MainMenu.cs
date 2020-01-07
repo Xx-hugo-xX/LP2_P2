@@ -5,14 +5,14 @@ namespace LP2_P2
 {
     public class MainMenu
     {
-        GameLoop Game { get; }
-        HighScoreManager HSManager { get; }
+        private GameLoop Game;
+
+        private HighScoreManager HSManager { get; }
 
         public MainMenu()
         {
             HSManager = new HighScoreManager();
             HSManager.CreateFile();
-            Game = new GameLoop(HSManager);
         }
 
         public void RunMenu()
@@ -28,6 +28,7 @@ namespace LP2_P2
                 switch (key)
                 {
                     case ConsoleKey.D1:
+                        Game = new GameLoop(HSManager);
                         Game.Loop();
                         break;
                     case ConsoleKey.D2:
@@ -56,7 +57,7 @@ namespace LP2_P2
                 string name = nameAndScore[0];
                 string score = nameAndScore[1];
 
-                Console.WriteLine($"Player: {name}\tScore: {score, 4}");
+                Console.WriteLine($"Player: {name}\tScore: {score,4}");
             }
 
             Console.ReadKey(true);

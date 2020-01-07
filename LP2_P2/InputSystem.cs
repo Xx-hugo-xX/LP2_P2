@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace LP2_P2
 {
@@ -10,9 +9,10 @@ namespace LP2_P2
         public Direction LastDir { get; set; }
 
         private readonly BlockingCollection<ConsoleKey> inputCol;
+        private bool run = true;
 
         public InputSystem()
-        { 
+        {
             inputCol = new BlockingCollection<ConsoleKey>();
             Dir = new Direction();
             LastDir = new Direction();
@@ -44,7 +44,10 @@ namespace LP2_P2
                         break;
                 }
             }
-            else Dir = LastDir;
+            else
+            {
+                Dir = LastDir;
+            }
         }
 
         public void ReadKeys()
@@ -54,7 +57,11 @@ namespace LP2_P2
             {
                 key = Console.ReadKey(true).Key;
                 inputCol.Add(key);
-            } while (key != ConsoleKey.Escape);
+            } while (run);
+        }
+        public void Stop()
+        {
+            run = false;
         }
     }
 }

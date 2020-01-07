@@ -17,9 +17,9 @@ namespace LP2_P2
         private T[,] next;
 
         // Dimension of frame in X axis
-        public int XDim { get => next.GetLength(0); }
+        public int XDim => next.GetLength(0);
         // Dimension of frame in Y axis
-        public int YDim { get => next.GetLength(1); }
+        public int YDim => next.GetLength(1);
 
         // Indexer to be used in a DoubleBuffer2D instance
         public T this[int x, int y]

@@ -37,19 +37,28 @@ namespace LP2_P2
                 Console.WriteLine("New High Score! " +
                         "What should we call you?\n");
 
+                Console.Write("---");
+                Console.CursorLeft = 0;
 
-                foreach (char c in name) Console.Write(c);
+                foreach (char c in name)
+                {
+                    Console.Write(c);
+                }
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
                 if (name.Count > 0 && keyInfo.Key == ConsoleKey.Backspace)
+                {
                     name.RemoveAt(name.Count - 1);
-
+                }
                 else if (name.Count < 3 && char.IsLetter(keyInfo.KeyChar))
+                {
                     name.Add(char.ToUpper(keyInfo.KeyChar));
-
+                }
                 else if (name.Count == 3 && keyInfo.Key == ConsoleKey.Enter)
+                {
                     valid = true;
+                }
             }
 
             Name = new string(name.ToArray());
@@ -57,9 +66,12 @@ namespace LP2_P2
 
         public int CompareTo(Score otherScore)
         {
-            return - TotalScore.CompareTo(otherScore.TotalScore);
+            return -TotalScore.CompareTo(otherScore.TotalScore);
         }
 
-        public override string ToString() => $"Score: {TotalScore}";
+        public override string ToString()
+        {
+            return $"Score: {TotalScore}";
+        }
     }
 }

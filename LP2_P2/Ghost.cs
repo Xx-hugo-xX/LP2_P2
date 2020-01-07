@@ -39,9 +39,6 @@ namespace LP2_P2
         // which position on the path it should update the position to
         private int counter = 0;
 
-        // Creates a object to lock and unlock case something is using the code
-        private readonly object listlock = new object();
-
         #endregion
 
         /// <summary>
@@ -160,7 +157,6 @@ namespace LP2_P2
                         }
                     }
                 }
-
             }
         }
 
@@ -199,10 +195,12 @@ namespace LP2_P2
         /// <param name="B"> The Second position </param>
         /// <returns> An Integer with the aprox distance between the two
         /// </returns>
-        private int GetDistace(Position A, Position B) =>
+        private int GetDistace(Position A, Position B)
+        {
             // Distance formula (square root of ((x-x^2) + (y-y^2)))
-            (int)Math.Sqrt(Math.Pow(Math.Abs(A.X - B.X), 2) +
+            return (int)Math.Sqrt(Math.Pow(Math.Abs(A.X - B.X), 2) +
              Math.Pow(Math.Abs(A.Y - B.Y), 2));
+        }
 
         /// <summary>
         /// Switches the target of the ghost acording to the state the ghost
@@ -226,19 +224,25 @@ namespace LP2_P2
 
             // if the ghost is in scatter mode
             else if (state == GhostState.scatter)
+            {
                 // the target is it's respective corner
                 target = corner;
+            }
 
             // if the ghost is eaten
             else if (state == GhostState.eaten)
             {
                 // Checks if the ghost is already at the center
                 if (Pos == center.Pos)
+                {
                     // Switches to the chase state
                     state = GhostState.chase;
+                }
                 else
+                {
                     // if not the target is the center piece
                     target = center;
+                }
             }
             // if the ghost is in his corner
             if (Pos == corner.Pos)
@@ -287,19 +291,21 @@ namespace LP2_P2
                             // Creates a variable and assigns it a value
                             // if x = 0 x will be 26 else x will be 1
                             int x = allPieces[c].Pos.X == 0 ? 26 : 1;
+
                             // Creates and adds a new Object with the x
                             // created and the y of the allPieces[c]
                             neighbors.Add(new DefaultObject(x,
                                 allPieces[c].Pos.Y, 'T', ObjectType.target));
                         }
                         else
+                        {
                             // Adds that Piece to neighbors list
                             neighbors.Add(allPieces[c]);
+                        }
                     }
                 }
             }
         }
-
         /// <summary>
         /// Updates the position of the ghost acording to the path found
         /// </summary>

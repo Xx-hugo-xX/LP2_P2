@@ -41,7 +41,7 @@ namespace LP2_P2
         "     O.OO         OO.O     " +
         "     O.OO OOO-OOO OO.O     " +
         "OOOOOO.OO O     O OO.OOOOOO" +
-        "T......   O     O   ......T" +
+        "T     .   O     O   .     T" +
         "OOOOOO.OO O     O OO.OOOOOO" +
         "     O.OO OOOOOOO OO.O     " +
         "     O.OO         OO.O     " +
@@ -94,11 +94,12 @@ namespace LP2_P2
                 inputSys.ProcessInput();
                 Update(mapVisuals);
                 Render();
-                //Thread.Sleep(Math.Abs(
-                //    (int)(start / 20000)
-                //    + 20
-                //    - (int)(DateTime.Now.Ticks / 20000)));
+                Thread.Sleep(Math.Abs(
+                    (int)(start / 20000)
+                    + 20
+                    - (int)(DateTime.Now.Ticks / 20000)));
             }
+            HSManager.AddHighScore(player.plyrScore);
         }
 
         public void Update(char[,] mapVisuals)
@@ -167,7 +168,7 @@ namespace LP2_P2
                 }
                 ghostUpdateTimer++;
 
-                if (ghostUpdateTimer > 5)
+                if (ghostUpdateTimer > 1)
                 {
                     UpdateGhostBehaviour();
                     ghostUpdateTimer = 0;
@@ -200,7 +201,9 @@ namespace LP2_P2
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                         }
                         else if (ghost.state != GhostState.eaten)
+                        {
                             KillPlayer();
+                        }
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||
@@ -236,8 +239,6 @@ namespace LP2_P2
                             mapVisuals.GetLength(0) - 2 : 1;
                     }
                 }
-
-                
             }
         }
 
@@ -321,16 +322,21 @@ namespace LP2_P2
         {
             // Checks if the ghost is in frightened state
             if (ghost.state == GhostState.frightened)
+            {
                 // Changes their visual to an f
                 db[ghost.Pos.X, ghost.Pos.Y] = 'f';
+            }
             // Checks if the ghost is in a eaten state
             else if (ghost.state == GhostState.eaten)
+            {
                 // Changes their visual to an "
                 db[ghost.Pos.X, ghost.Pos.Y] = '"';
+            }
             else
+            {
                 // If it's none of the above sets it to it's usual visual
                 db[ghost.Pos.X, ghost.Pos.Y] = ghost.Visuals;
-
+            }
         }
         /// <summary>
         /// Assembles the map by creating the necessary things and adding them
@@ -392,10 +398,9 @@ namespace LP2_P2
 
         private void KillPlayer()
         {
-            HSManager.AddHighScore(player.plyrScore);
+            inputSys.Stop();
             running = false;
         }
-
         /// <summary>
         /// Converts the string with the visuals to a double char array to be
         /// easier to acess and manipulate
@@ -483,8 +488,10 @@ namespace LP2_P2
                 orangeTarget.Pos = player.Pos;
             }
             else
+            {
                 // The target is the coordinates of its corner
                 orangeTarget.Pos = new Position(1, 21);
+            }
 
             // checks if the old position of the player is not the
             // current position and the the current position of the

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LP2_P2
+﻿namespace LP2_P2
 {
     public class Position
     {
@@ -13,17 +11,26 @@ namespace LP2_P2
             Y = y;
         }
 
-        public static bool operator ==(Position A, Position B) => 
-            A.X == B.X && A.Y == B.Y;
-        public static bool operator !=(Position A, Position B) =>
-            A.X != B.X && A.Y != B.Y;
+        public static bool operator ==(Position A, Position B)
+        {
+            return A.X == B.X && A.Y == B.Y;
+        }
+
+        public static bool operator !=(Position A, Position B)
+        {
+            return A.X != B.X && A.Y != B.Y;
+        }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(this, obj))
+            {
                 return true;
+            }
             else
+            {
                 return false;
+            }
         }
 
         public override int GetHashCode()
