@@ -24,7 +24,7 @@ namespace LP2_P2
         public readonly string fileNameFull;
 
         // Sets the maximum number of High Scores to be saved in the file
-        private int maxHS = 10;
+        private readonly int maxHS = 10;
 
         // Declares the list that will store the High Scores
         private List<Score> highScores;
@@ -42,8 +42,10 @@ namespace LP2_P2
 
             // Checks if the user doesn't have the wanted directory
             if (!Directory.Exists(filePath))
+            {
                 // Creates the directory for the user
                 Directory.CreateDirectory(filePath);
+            }
 
             // Sets the name of the file where the High Scores will be saved
             fileName = "HighScores.txt";
@@ -63,8 +65,10 @@ namespace LP2_P2
         {
             // Checks if the file does not exist 
             if (!File.Exists(fileNameFull))
+            {
                 // Creates the file for the user, using "FileStream"
-                using (FileStream fs = File.Create(fileNameFull)) {}
+                using FileStream fs = File.Create(fileNameFull);
+            }
 
             // Calls method "ReadHighScores"
             ReadHighScores();
@@ -117,17 +121,17 @@ namespace LP2_P2
         {
             // Calls method "IsHighScore" to check if the given Score
             // is to be added to the "highScores" list
-            if(IsHighScore(score))
+            if (IsHighScore(score))
             {
                 // Clears the console
                 Console.Clear();
 
                 // Checks if the Score does not have a name associated
                 if (score.Name == default)
-
+                {
                     // Sets Score's Name based on user input
                     score.InsertName(SetHighScoreName());
-
+                }
                 // Clears the console
                 Console.Clear();
 
@@ -161,11 +165,14 @@ namespace LP2_P2
         {
             // Returns true if the "highScores" list has less
             // Scores than the maximum ammount of Scores allowed
-            if (highScores.Count < maxHS) return true;
+            if (highScores.Count < maxHS)
+            {
+                return true;
+            }
 
             // Checks if the given Scores "TotalScore" is higher
             // than the lowest "TotalScore"
-            if (score.TotalScore > highScores[maxHS-1].TotalScore)
+            if (score.TotalScore > highScores[maxHS - 1].TotalScore)
             {
                 // Removes the last Score from the "highScores" list
                 highScores.RemoveAt(maxHS - 1);
@@ -189,11 +196,13 @@ namespace LP2_P2
 
             // Loops through each element of the "highScores" list
             foreach (Score hs in highScores)
+            {
 
                 // Writes the Names and TotalScores (separated by a 'tab')
                 // of each element of the "highScores" list
                 // on the High Scores file
                 sw.WriteLine(hs.Name + "\t" + hs.TotalScore);
+            }
         }
 
         /// <summary>

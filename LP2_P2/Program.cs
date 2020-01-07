@@ -16,7 +16,7 @@ namespace LP2_P2
         /// <summary>
         /// Runs program and it's methods.
         /// </summary>
-        static void Main()
+        private static void Main()
         {
             // Set window's width and height to the values specified by the
             // class constant variables WindowWidth and WindowHeight
