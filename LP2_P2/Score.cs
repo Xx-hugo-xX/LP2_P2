@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace LP2_P2
 {
@@ -56,9 +55,14 @@ namespace LP2_P2
             TotalScore += scoreToAdd;
         }
         
-        // ---------------------------DO XML LATER-----------------------------
+        /// <summary>
+        /// Sets the Scores name as the given string
+        /// </summary>
+        /// <param name="name">String that will be
+        /// set as the Scores name</param>
         public void InsertName(string name)
         {
+            // Sets the Scores name as the given string
             Name = name;
         }
         /// <summary>

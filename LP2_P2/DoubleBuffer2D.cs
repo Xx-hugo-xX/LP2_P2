@@ -28,17 +28,26 @@ namespace LP2_P2
             set => next[x, y] = value;
         }
 
-        // Clears the next frame, to be written over again
+        /// <summary>
+        /// Clears the next frame, to be written over again
+        /// </summary>
         public void Clear()
         {
             Array.Clear(next, 0, XDim * YDim - 1);
         }
 
-        // Class constructor
+        /// <summary>
+        /// Class constructor
+        /// </summary>
+        /// <param name="x">X size of the buffer</param>
+        /// <param name="y">Y size of the buffer</param>
         public DoubleBuffer2D(int x, int y)
         {
+            // Sets 'current' as a new bidimensional array with specified size
             current = new T[x, y];
+            // Sets 'next' as a new bidimensional array with specified size
             next = new T[x, y];
+            // Calls method 'Clear'
             Clear();
         }
 
@@ -47,10 +56,12 @@ namespace LP2_P2
         /// </summary>
         public void Swap()
         {
-            // Sets new auxiliary frame with the value of the next frame
-            T[,] auxNext = current;
+            // Sets new auxiliary frame with the value of the 'current' frame
+            T[,] auxFrame = current;
+            // Sets 'current' frame with the value of the 'next' frame
             current = next;
-            next = auxNext;
+            // Sets 'next' frame with the value of 'auxFrame'
+            next = auxFrame;
         }
     }
 }

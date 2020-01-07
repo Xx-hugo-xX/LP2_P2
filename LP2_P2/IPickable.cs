@@ -5,9 +5,7 @@
     /// </summary>
     public interface IPickable
     {
-        /// <summary>
-        /// Public readonly property of type int ScoreVal, with only a getter
-        /// </summary>
+        // Public readonly property of type int ScoreVal, with only a getter
         public int ScoreVal { get; }
     }
 }
