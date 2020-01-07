@@ -28,14 +28,29 @@ namespace LP2_P2
             plyrScore = new Score();
         }
 
+        /// <summary>
+        /// Displays "Death Message" and runs the 'AddHighScore'
+        /// method of the 'HighScoreManager' class
+        /// </summary>
+        /// <param name="inputSys">Game's InputSystem that will be
+        /// closed once the method is called</param>
+        /// <param name="HSManager">Game's HighScoreManager that will be used
+        /// to add the players score to the HighScores file</param>
         public void Death(InputSystem inputSys, HighScoreManager HSManager)
         {
+            // Calls method 'CloseInputReading' from the 'InputSystem' class
             inputSys.CloseInputReading();
 
+            // Clears the console
             Console.Clear();
-            Console.WriteLine("Game Over!");
+            // Writes the "GameOver Message"
+            Console.WriteLine("Game Over!\n\nPress any key to continue...");
+            // Asks for user input before continuing
             Console.ReadKey(true);
-
+            
+            // Calls method 'AddHighScore' from the 'HighScoreManager'
+            // class to add the players score to the HighScores
+            // (if it is a High Score)
             HSManager.AddHighScore(plyrScore);
         }
     }
