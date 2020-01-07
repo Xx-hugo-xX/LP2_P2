@@ -191,8 +191,7 @@ namespace LP2_P2
             CheckForCollisions();
         }
         /// <summary>
-        /// Loops through the mapVisuals two dimensional char array and
-        /// assigns the visuals to the DoubleBuffer's next frame, swaps the
+        /// Assigns the visuals to the DoubleBuffer's next frame, swaps the
         /// current frame for the next and displays, and runs another loop
         /// through the doublebuffer, checking various possible objects in a 
         /// position and changing the console's background and/or foreground 
