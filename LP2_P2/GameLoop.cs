@@ -20,7 +20,7 @@ namespace LP2_P2
         private readonly InputSystem inputSys;
         // Creates the thread for the InputSystem variable
         private readonly Thread keyReader;
-        
+
         // Creates a variable of Ghost for all of the 4 ghosts
         private readonly Ghost redGhost;
         private readonly Ghost pinkGhost;
@@ -28,11 +28,11 @@ namespace LP2_P2
         private readonly Ghost blueGhost;
 
         // Creates 3 Targets for the the AI of the different ghosts
-        private readonly DefaultObject pinkTarget = 
+        private readonly DefaultObject pinkTarget =
             new DefaultObject(0, 0, ' ', ObjectType.target);
-        private readonly DefaultObject orangeTarget = 
+        private readonly DefaultObject orangeTarget =
             new DefaultObject(0, 0, ' ', ObjectType.target);
-        private readonly DefaultObject blueTarget = 
+        private readonly DefaultObject blueTarget =
             new DefaultObject(0, 0, ' ', ObjectType.target);
 
         // Int for keeping track of the current level
@@ -198,10 +198,10 @@ namespace LP2_P2
         public void Render()
         {
             Console.WriteLine($"{player.plyrScore}\t\tLevel: {level}");
-            // Loop for the amount of chars in the second position of the array
+            // Loop for the amount of chars in the y position of the array
             for (int y = 0; y < mapVisuals.GetLength(1); y++)
             {
-                // Loop for the amount of chars in the first position of the array
+                // Loop for the amount of chars in the x position of the array
                 for (int x = 0; x < mapVisuals.GetLength(0); x++)
                 {
                     // Assigns the corresponding visual to the buffer
@@ -561,7 +561,7 @@ namespace LP2_P2
                             // Switches the state of that ghost to eaten
                             ghost.state = GhostState.eaten;
 
-                            // Add picked up item's score value to player's score
+                            // Add picked up item's ScoreVal to player's score
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                         }
                         // If the ghost is not in eaten state
@@ -594,8 +594,8 @@ namespace LP2_P2
                             new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
                             ObjectType.emptySpace);
 
-                        // Updates visual for position player was in if there was a
-                        // a pickable on it
+                        // Updates visual for position player was in if there
+                        // was a pickable on it
                         mapVisuals[obj[i].Pos.X, obj[i].Pos.Y] = ' ';
 
                         // Add picked up item's score value to player's score
@@ -604,8 +604,8 @@ namespace LP2_P2
                     // Checks if the player is on a Teleporter
                     if (obj[i].ObjType == ObjectType.teleporter)
                     {
-                        // If his postition is 0 teleports him to 26 else teleports him
-                        // to 1
+                        // If his postition is 0 teleports him to 26 else 
+                        // teleports him to 1
                         player.Pos.X = player.Pos.X == 0 ?
                             mapVisuals.GetLength(0) - 2 : 1;
                     }
@@ -620,7 +620,8 @@ namespace LP2_P2
         private void UpdateGhostState(Ghost ghost)
         {
             // Checks if the timer is bigger than 20 and is in chase mode
-            if (Math.Abs(stateSwapTimer - DateTime.Now.Second) >= 20 && ghost.state == GhostState.chase)
+            if (Math.Abs(stateSwapTimer - DateTime.Now.Second) >= 20 &&
+                ghost.state == GhostState.chase)
             {
                 // switches the state back to scatter
                 ghost.state = GhostState.scatter;
@@ -628,7 +629,8 @@ namespace LP2_P2
                 updateSwapTimer = true;
             }
             // Checks if the timer is bigger than 7 and is in scatter mode
-            else if (Math.Abs(stateSwapTimer - DateTime.Now.Second) >= 5 && ghost.state == GhostState.scatter)
+            else if (Math.Abs(stateSwapTimer - DateTime.Now.Second) >= 5 &&
+                ghost.state == GhostState.scatter)
             {
                 // switches the state back to chase mode
                 ghost.state = GhostState.chase;
@@ -729,7 +731,8 @@ namespace LP2_P2
         {
             // if statement that checks if any objects of type pellet exist
             // in the physicsObjects list
-            if (!physicsObjects.Exists(obj => obj.ObjType == ObjectType.pellet))
+            if (!physicsObjects.Exists(obj => obj.ObjType ==
+                ObjectType.pellet))
             {
                 // Increment level number
                 level++;
