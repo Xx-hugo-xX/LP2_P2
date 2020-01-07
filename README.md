@@ -92,6 +92,23 @@ still inherit from Object. Every Object must also implement an interface
 allowing that Object to give a score, then managed by a class dedicates to
 storing the scores by creating, reading and writing to a file.
 
+### Design Patterns
+
+The design patterns applied to this project were the requested Game Loop, 
+Update Method and Double Buffer design patterns, although the second one was
+breached, in part, as the update methods ended up being placed in the GameLoop
+class. The reason why these patterns were used are as follows:
+
+Game Loop - Decouple the input processing, updating and rendering times from
+the player's input, allowing the game to run as we see it without stopping
+and waiting for the player's input;
+
+Update Method - Create a logic of objects seemingly independent by telling
+each of them to update their behaviour one frame at a time;
+
+Double Buffer - Simulate an instantaneous sequence of operations in order to
+display the game's graphics to the player without stopping the game.
+
 ### Collisons
 
 Every Object contains a collider, an array of integers with the x, y, lenght and
@@ -114,6 +131,14 @@ till it reaches the original position. Theres two problems with this aproach,
 first, this AI is quite heavy, and the original pac-man used a simpler and more
 efficient way. And second, it's making a new path every second update even if it
 doesn't need to, resulting in a lower performace and development of this AI.
+
+### Fluxogram
+
+![Fluxogram](Fluxogram.png)
+
+### UML Diagram
+
+![UML_Diagram](UML_Diagram.png)
 
 ## References
 
