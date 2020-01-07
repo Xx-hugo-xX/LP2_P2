@@ -26,7 +26,7 @@ namespace LP2_P2
         private Ghost pinkGhost;
         private Ghost orangeGhost;
         private Ghost blueGhost;
-
+        
         // Creates 3 Targets for the the AI of the different ghosts
         private readonly DefaultObject pinkTarget =
             new DefaultObject(0, 0, ' ', ObjectType.target);
@@ -145,8 +145,11 @@ namespace LP2_P2
                 inputSys.ProcessInput();
                 // Runs the Update method
                 Update(mapVisuals);
-                // Runs the Render method
-                Render();
+                if (inputSys.IsRunning)
+                {
+                    // Runs the Render method
+                    Render();
+                }
                 Thread.Sleep(Math.Abs(
                     (int)(start / 20000)
                     + 20
@@ -568,7 +571,8 @@ namespace LP2_P2
                     }
                     // Checks if the player is on a Pellet
                     if (obj[i].ObjType == ObjectType.pellet ||
-                            obj[i].ObjType == ObjectType.bigPellet)
+                            obj[i].ObjType == ObjectType.bigPellet ||
+                            obj[i].ObjType == ObjectType.bonusFruit)
                     {
                         // Checks if it's a bigPellet
                         if (obj[i].ObjType == ObjectType.bigPellet)

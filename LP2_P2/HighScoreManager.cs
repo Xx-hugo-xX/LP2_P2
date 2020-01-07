@@ -194,7 +194,6 @@ namespace LP2_P2
             // Loops through each element of the "highScores" list
             foreach (Score hs in highScores)
             {
-
                 // Writes the Names and TotalScores (separated by a 'tab')
                 // of each element of the "highScores" list
                 // on the High Scores file
