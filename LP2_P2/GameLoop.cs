@@ -22,10 +22,10 @@ namespace LP2_P2
         private readonly Thread keyReader;
 
         // Creates a variable of Ghost for all of the 4 ghosts
-        private readonly Ghost redGhost;
-        private readonly Ghost pinkGhost;
-        private readonly Ghost orangeGhost;
-        private readonly Ghost blueGhost;
+        private Ghost redGhost;
+        private Ghost pinkGhost;
+        private Ghost orangeGhost;
+        private Ghost blueGhost;
 
         // Creates 3 Targets for the the AI of the different ghosts
         private readonly DefaultObject pinkTarget =
@@ -93,7 +93,7 @@ namespace LP2_P2
             GenerateMap();
 
             // Generate map's pickables and add then to the physicsObjects list
-            GeneratePickables();
+            // GeneratePickables();
 
             // Creates a new Player
             player = new Player();
@@ -101,13 +101,8 @@ namespace LP2_P2
             // Adds the created player to the physicsObjects list
             physicsObjects.Add(player);
 
-            // Creates the 4 ghosts at the center position passing through
-            // their cordinates, the list of physicsObjects, their corner,
-            // visuals and the amount of score they should give
-            redGhost = new Ghost(12, 11, physicsObjects, 1, 1, 'R', 200);
-            pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1, 'P', 200);
-            orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21, 'G', 200);
-            blueGhost = new Ghost(15, 11, physicsObjects, 25, 21, 'B', 200);
+            // Creates ghosts
+            SpawnGhosts();
 
             // Adds the created ghosts to the physicsObjects list
             physicsObjects.Add(redGhost);
@@ -740,11 +735,23 @@ namespace LP2_P2
                 ConvertMapToDoubleArray();
                 // Generate all pickables
                 GeneratePickables();
+                // Spawn ghosts into their initial positions
                 // Reset player's position
                 player.Pos = new Position(13, 17);
                 // Reset all input, as to have a clean slate for the new level
                 inputSys.ResetInput();
             }
+        }
+
+        private void SpawnGhosts()
+        {
+            // Creates the 4 ghosts at the center position passing through
+            // their cordinates, the list of physicsObjects, their corner,
+            // visuals and the amount of score they should give
+            redGhost = new Ghost(12, 11, physicsObjects, 1, 1, 'R', 200);
+            pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1, 'P', 200);
+            orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21, 'G', 200);
+            blueGhost = new Ghost(15, 11, physicsObjects, 25, 21, 'B', 200);
         }
     }
 }
