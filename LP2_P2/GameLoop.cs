@@ -37,8 +37,6 @@ namespace LP2_P2
 
         // Int for keeping track of the current level
         private int level;
-        // Bool for running or stopping the main loop
-        private bool running;
         // Bool for resetting the stateSwapTimer when true
         private bool updateSwapTimer = false;
         // Interval when the ghosts behaviour and position should be updated
