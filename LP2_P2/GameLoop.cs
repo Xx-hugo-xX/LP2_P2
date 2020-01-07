@@ -37,8 +37,6 @@ namespace LP2_P2
 
         // Int for keeping track of the current level
         private int level;
-        // Bool for running or stopping the main loop
-        private bool running;
         // Bool for resetting the stateSwapTimer when true
         private bool updateSwapTimer = false;
         // Interval when the ghosts behaviour and position should be updated
@@ -190,17 +188,20 @@ namespace LP2_P2
             // of the player with other objects
             CheckForCollisions();
         }
-
         /// <summary>
-        /// 
+        /// Assigns the visuals to the DoubleBuffer's next frame, swaps the
+        /// current frame for the next and displays, and runs another loop
+        /// through the doublebuffer, checking various possible objects in a 
+        /// position and changing the console's background and/or foreground 
+        /// colours according to the char read, then writes it.
         /// </summary>
         public void Render()
         {
             Console.WriteLine($"{player.plyrScore}\t\tLevel: {level}");
-            // Loop for the amount of chars in the second position of the array
+            // Loop for the amount of chars in the y position of the array
             for (int y = 0; y < mapVisuals.GetLength(1); y++)
             {
-                // Loop for the amount of chars in the first position of the array
+                // Loop for the amount of chars in the x position of the array
                 for (int x = 0; x < mapVisuals.GetLength(0); x++)
                 {
                     // Assigns the corresponding visual to the buffer
@@ -303,7 +304,7 @@ namespace LP2_P2
         }
         /// <summary>
         /// Changes the visuals of the ghosts will appear acording to their
-        /// state
+        /// state.
         /// </summary>
         /// <param name="ghost"> The current ghost being checked </param>
         private void SetBufferGhostVisuals(Ghost ghost)
@@ -560,7 +561,7 @@ namespace LP2_P2
                             // Switches the state of that ghost to eaten
                             ghost.state = GhostState.eaten;
 
-                            // Add picked up item's score value to player's score
+                            // Add picked up item's ScoreVal to player's score
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                         }
                         // If the ghost is not in eaten state
@@ -593,8 +594,8 @@ namespace LP2_P2
                             new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
                             ObjectType.emptySpace);
 
-                        // Updates visual for position player was in if there was a
-                        // a pickable on it
+                        // Updates visual for position player was in if there
+                        // was a pickable on it
                         mapVisuals[obj[i].Pos.X, obj[i].Pos.Y] = ' ';
 
                         // Add picked up item's score value to player's score
@@ -603,8 +604,8 @@ namespace LP2_P2
                     // Checks if the player is on a Teleporter
                     if (obj[i].ObjType == ObjectType.teleporter)
                     {
-                        // If his postition is 0 teleports him to 26 else teleports him
-                        // to 1
+                        // If his postition is 0 teleports him to 26 else 
+                        // teleports him to 1
                         player.Pos.X = player.Pos.X == 0 ?
                             mapVisuals.GetLength(0) - 2 : 1;
                     }
@@ -619,7 +620,8 @@ namespace LP2_P2
         private void UpdateGhostState(Ghost ghost)
         {
             // Checks if the timer is bigger than 20 and is in chase mode
-            if (Math.Abs(stateSwapTimer - DateTime.Now.Second) >= 20 && ghost.state == GhostState.chase)
+            if (Math.Abs(stateSwapTimer - DateTime.Now.Second) >= 20 &&
+                ghost.state == GhostState.chase)
             {
                 // switches the state back to scatter
                 ghost.state = GhostState.scatter;
@@ -627,7 +629,8 @@ namespace LP2_P2
                 updateSwapTimer = true;
             }
             // Checks if the timer is bigger than 7 and is in scatter mode
-            else if (Math.Abs(stateSwapTimer - DateTime.Now.Second) >= 5 && ghost.state == GhostState.scatter)
+            else if (Math.Abs(stateSwapTimer - DateTime.Now.Second) >= 5 &&
+                ghost.state == GhostState.scatter)
             {
                 // switches the state back to chase mode
                 ghost.state = GhostState.chase;
@@ -718,22 +721,28 @@ namespace LP2_P2
             blueGhost.UpdatePosition();
         }
 
-        // Increments level number, clears physicsObjects list,
-        // generates the map again, while keeping player's score, places player
-        // back in his starting position and resets input
+
+        /// <summary>
+        /// Increments level number generates pickables again, while keeping 
+        /// player's score, places the player back in his starting position 
+        /// and resets input.
+        /// </summary>
         private void CheckForLevelFinish()
         {
+            // if statement that checks if any objects of type pellet exist
+            // in the physicsObjects list
             if (!physicsObjects.Exists(obj =>
             obj.ObjType == ObjectType.pellet))
             {
+                // Increment level number
                 level++;
-                // Clear list of physics objects, to generate the level again
-                // into that list
-                physicsObjects.Clear();
+                // Convert map string to double array
                 ConvertMapToDoubleArray();
-                GenerateMap();
+                // Generate all pickables
                 GeneratePickables();
+                // Reset player's position
                 player.Pos = new Position(13, 17);
+                // Reset all input, as to have a clean slate for the new level
                 inputSys.ResetInput();
             }
         }
