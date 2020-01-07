@@ -82,6 +82,39 @@ of the class.
 
 ## Architecture
 
+### Description
+
+The program as a basis works with Objects, every piece of the map and everything
+in it inherits from Object, this Object must have a collider, a position, and
+visuals. Most of the Objects are DefaultObjects only different in it's visual or
+type, except for the Ghost and Player that have their own specific classes and
+still inherit from Object. Every Object must also implement an interface
+allowing that Object to give a score, then managed by a class dedicates to
+storing the scores by creating, reading and writing to a file.
+
+### Collisons
+
+Every Object contains a collider, an array of integers with the x, y, lenght and
+width the class physics has a list of all the Objects and access to it's 
+colliders and through methods checks if the poisition of the object given is 
+inside any collider. This can return an Object or a list of Objects 
+(With an Overload) and then compare the ObjectType with the ObjectType that 
+needs to be checked. This method of collision works well for most objects
+including with lenght and width, but for moving objects it can sometimes not
+detect the collision.
+
+### AI
+
+The AI works with an A* algorithem, basically it checks the neighbors of a cell 
+and gives it a cost depending on how much it has to move and how far is from the
+target, if it finds a cell with a low cost adds it as a parent of the current
+cell, repeating the process for the new cell. When it reaches the target creates
+a list of positions by checking all the parents of all the cells from the target
+till it reaches the original position. Theres two problems with this aproach, 
+first, this AI is quite heavy, and the original pac-man used a simpler and more
+efficient way. And second, it's making a new path every second update even if it
+doesn't need to, resulting in a lower performace and development of this AI.
+
 ## References
 
 ### Code
