@@ -93,7 +93,7 @@ namespace LP2_P2
             GenerateMap();
 
             // Generate map's pickables and add then to the physicsObjects list
-            // GeneratePickables();
+            GeneratePickables();
 
             // Creates a new Player
             player = new Player();
