@@ -2,6 +2,9 @@
 
 namespace LP2_P2
 {
+    /// <summary>
+    /// Responsible for most of the collision checking
+    /// </summary>
     public class Physics
     {
         // Creates a list of all the objects in game
@@ -44,6 +47,12 @@ namespace LP2_P2
             // If it isn't colliding with anything returns null
             return null;
         }
+        /// <summary>
+        /// Overload of the collision method responsible for returning a list
+        /// of all the objects it collided with
+        /// </summary>
+        /// <param name="col"> The Object to be checked </param>
+        /// <returns> A list of all the objects it collided with </returns>
         public List<Object> Collision(Object col)
         {
             List<Object> a = new List<Object>();

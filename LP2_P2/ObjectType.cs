@@ -1,5 +1,8 @@
 ﻿namespace LP2_P2
 {
+    /// <summary>
+    /// Defines which type of object it is
+    /// </summary>
     public enum ObjectType
     {
         emptySpace,

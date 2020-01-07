@@ -6,30 +6,53 @@ namespace LP2_P2
 {
     public class GameLoop
     {
-        private readonly Player player;
-        private readonly DoubleBuffer2D<char> db;
-        private readonly InputSystem inputSys;
-        private readonly Thread keyReader;
+        #region -- variables ---
 
+        // A plubic HighScoreManager 
+        public HighScoreManager HSManager;
+
+        // Creates a variable of type player
+        private readonly Player player;
+
+        // Creates a variable of DoubleBuffer for when rendering
+        private readonly DoubleBuffer2D<char> db;
+        // Creates a variable of InputSystem for use on a different thread
+        private readonly InputSystem inputSys;
+        // Creates the thread for the InputSystem variable
+        private readonly Thread keyReader;
+        
+        // Creates a variable of Ghost for all of the 4 ghosts
         private readonly Ghost redGhost;
         private readonly Ghost pinkGhost;
         private readonly Ghost orangeGhost;
         private readonly Ghost blueGhost;
 
-        private readonly DefaultObject pinkTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
-        private readonly DefaultObject orangeTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
-        private readonly DefaultObject blueTarget = new DefaultObject(0, 0, ' ', ObjectType.target);
+        // Creates 3 Targets for the the AI of the different ghosts
+        private readonly DefaultObject pinkTarget = 
+            new DefaultObject(0, 0, ' ', ObjectType.target);
+        private readonly DefaultObject orangeTarget = 
+            new DefaultObject(0, 0, ' ', ObjectType.target);
+        private readonly DefaultObject blueTarget = 
+            new DefaultObject(0, 0, ' ', ObjectType.target);
 
+        // Bool for running or stopping the main loop
         private bool running;
+        // Bool for resetting the stateSwapTimer when true
         private bool updateSwapTimer = false;
+        // Interval when the ghosts behaviour and position should be updated
         private int ghostUpdateTimer = 0;
+        // Timers for when to switch states
         private int stateSwapTimer = DateTime.Now.Second;
         private int frightenTimer = DateTime.Now.Second;
 
+        // List containing all the objects in the map
         private readonly List<Object> physicsObjects = new List<Object>();
+        // Creates a variable of type Physics for cheking collisions
         private readonly Physics col;
+        // A char array for saving the converted mapBuilder string
         private readonly char[,] mapVisuals = new char[27, 23];
 
+        // A string of how the map should look
         private readonly string mapBuilder =
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO" +
         "O............O............O" +
@@ -54,65 +77,105 @@ namespace LP2_P2
         "O.OOOOOOOOOO.O.OOOOOOOOOO.O" +
         "O.........................O" +
         "OOOOOOOOOOOOOOOOOOOOOOOOOOO";
+        #endregion
 
-        public HighScoreManager HSManager;
-
+        /// <summary>
+        /// Constructor of the class GameLoop initializing all the variables
+        /// created above
+        /// </summary>
+        /// <param name="hsManager"> The highScoreManager passed </param>
         public GameLoop(HighScoreManager hsManager)
         {
-            player = new Player();
-
-            physicsObjects.Add(player);
+            // Converts the string for visualizing the map into a double array
             ConvertMapToDoubleArray();
+            // Creates and adds the Objects needed to form the map
             GenerateMap();
 
+            // Creates a new Player
+            player = new Player();
+
+            // Adds the created player to the physicsObjects list
+            physicsObjects.Add(player);
+
+            // Creates the 4 ghosts at the center position passing through
+            // their cordinates, the list of physicsObjects, their corner,
+            // visuals and the amount of score they should give
             redGhost = new Ghost(12, 11, physicsObjects, 1, 1, 'R', 200);
             pinkGhost = new Ghost(13, 11, physicsObjects, 25, 1, 'P', 200);
             orangeGhost = new Ghost(14, 11, physicsObjects, 1, 21, 'G', 200);
             blueGhost = new Ghost(15, 11, physicsObjects, 25, 21, 'B', 200);
 
+            // Adds the created ghosts to the physicsObjects list
             physicsObjects.Add(redGhost);
             physicsObjects.Add(pinkGhost);
             physicsObjects.Add(orangeGhost);
             physicsObjects.Add(blueGhost);
 
+            // Creates a new Physics passing in all the physicsObjects list
             col = new Physics(physicsObjects);
 
+            // Creates a new DoubleBuffer with a fixed size of 30 by 30
             db = new DoubleBuffer2D<char>(30, 30);
+            // Creates a new Input System
             inputSys = new InputSystem();
+            // Creates a new Thread and gives it a method of InputSystem
             keyReader = new Thread(inputSys.ReadKeys);
+
+            // Equals this HighScoreManager to the one given
             HSManager = hsManager;
+            // hides the cursor
             Console.CursorVisible = false;
         }
-
+        /// <summary>
+        /// The main loop of the game
+        /// </summary>
         public void Loop()
         {
+            // Starts the input thread creates
             keyReader.Start();
+            // Sets the running to true
             running = true;
+            // Runs and executes the code while running is true
             while (running)
             {
+                // creates a long with the value of the ticks at the moment
                 long start = DateTime.Now.Ticks;
+                // Processes the input
                 inputSys.ProcessInput();
+                // Runs the Update method
                 Update(mapVisuals);
+                // Runs the Render method
                 Render();
                 Thread.Sleep(Math.Abs(
                     (int)(start / 20000)
                     + 20
                     - (int)(DateTime.Now.Ticks / 20000)));
             }
+            // Adds the current score to the highscore
             HSManager.AddHighScore(player.plyrScore);
         }
-
+        /// <summary>
+        /// Main method of the game responsible for movement, collision and AI
+        /// </summary>
+        /// <param name="mapVisuals"> The double array of the map </param>
         public void Update(char[,] mapVisuals)
         {
+            // Checks if the inputSystem has a direction
             if (inputSys.Dir != Direction.None)
             {
+                // Creates an object for saving the object the player will
+                // collide with
                 Object wallDetection;
+
+                // Sets the OldPosition of the Player to it's current one
                 player.OldPos.X = player.Pos.X;
                 player.OldPos.Y = player.Pos.Y;
 
+                // Switch case acording to the direction
                 switch (inputSys.Dir)
                 {
                     case Direction.Up:
+                        // Retrives the object above the player
                         wallDetection = col.Collision(player, 0, -1);
                         // Checks if the next position up is not a wall
                         if (wallDetection == null || wallDetection.ObjType
@@ -121,11 +184,13 @@ namespace LP2_P2
                         {
                             // Decreases the y of the player by 1
                             player.Pos.Y = Math.Max(0, player.Pos.Y - 1);
+                            // Sets the last direction to the current direction
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
 
                     case Direction.Left:
+                        // Retrives the object left of the player
                         wallDetection = col.Collision(player, -1, 0);
                         // Checks if the next position left is not a wall
                         if (wallDetection == null || wallDetection.ObjType
@@ -134,11 +199,13 @@ namespace LP2_P2
                         {
                             // Decreases the x of the player by 1
                             player.Pos.X = Math.Max(0, player.Pos.X - 1);
+                            // Sets the last direction to the current direction
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
 
                     case Direction.Down:
+                        // Retrives the object below the player
                         wallDetection = col.Collision(player, 0, 1);
                         // Checks if the next position down is not a wall
                         if (wallDetection == null || wallDetection.ObjType
@@ -148,11 +215,13 @@ namespace LP2_P2
                             // Increases the y of the player by 1
                             player.Pos.Y =
                                 Math.Min(db.YDim - 1, player.Pos.Y + 1);
+                            // Sets the last direction to the current direction
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
 
                     case Direction.Right:
+                        // Retrives the object right to the player
                         wallDetection = col.Collision(player, 1, 0);
                         // Checks if the next position right is not a wall
                         if (wallDetection == null || wallDetection.ObjType
@@ -162,15 +231,20 @@ namespace LP2_P2
                             // Increases the X of the player by 1
                             player.Pos.X =
                                 Math.Min(db.XDim - 1, player.Pos.X + 1);
+                            // Sets the last direction to the current direction
                             inputSys.LastDir = inputSys.Dir;
                         }
                         break;
                 }
+                // increments one to the ghostUpdateTimer
                 ghostUpdateTimer++;
 
+                // Checks if that timer is bigger than a number
                 if (ghostUpdateTimer > 1)
                 {
+                    // Updates the position and the path of the AI
                     UpdateGhostBehaviour();
+                    // Resets the timer
                     ghostUpdateTimer = 0;
                 }
             }
@@ -184,24 +258,35 @@ namespace LP2_P2
             orangeGhost.UpdatePhysics();
             blueGhost.UpdatePhysics();
 
+            // Creates a list of objects the playes is colliding with
             List<Object> obj = col.Collision(player);
 
+            // Checks if the list is not null
             if (obj != null)
             {
+                // Runs the code acording to the amount of objects in obj
                 for (int i = 0; i < obj.Count; i++)
                 {
+                    // Checks if the object retrived is a ghost
                     if (obj[i].ObjType == ObjectType.ghost)
                     {
+                        // Creates a ghost variable and transforms the object
+                        // into a ghost (since we know it's a ghost because of 
+                        // the if statement it shouldn't fail)
                         Ghost ghost = obj[i] as Ghost;
+                        // Checks if the current ghost is frightened
                         if (ghost.state == GhostState.frightened)
                         {
+                            // Switches the state of that ghost to eaten
                             ghost.state = GhostState.eaten;
 
                             // Add picked up item's score value to player's score
                             player.plyrScore.AddScore(obj[i].ScoreVal);
                         }
+                        // If the ghost is not in eaten state
                         else if (ghost.state != GhostState.eaten)
                         {
+                            // kills the player ending the game
                             KillPlayer();
                         }
                     }
@@ -209,16 +294,21 @@ namespace LP2_P2
                     if (obj[i].ObjType == ObjectType.pellet ||
                             obj[i].ObjType == ObjectType.bigPellet)
                     {
+                        // Checks if it's a bigPellet
                         if (obj[i].ObjType == ObjectType.bigPellet)
                         {
+                            // Switches the sate of all the ghosts to frighten
                             redGhost.state = GhostState.frightened;
                             pinkGhost.state = GhostState.frightened;
                             orangeGhost.state = GhostState.frightened;
                             blueGhost.state = GhostState.frightened;
 
+                            // Resets the frightenTimer to the current second
                             frightenTimer = DateTime.Now.Second;
                         }
 
+                        // Replaces that Object on physicsObjects
+                        //by an empty space
                         physicsObjects[physicsObjects.IndexOf(obj[i])] =
                             new DefaultObject(player.Pos.X, player.Pos.Y, ' ',
                             ObjectType.emptySpace);
@@ -395,10 +485,14 @@ namespace LP2_P2
                 }
             }
         }
-
+        /// <summary>
+        /// Called when the player gets killed by a ghost
+        /// </summary>
         private void KillPlayer()
         {
+            // Stops the while loop on input
             inputSys.Stop();
+            // Sets running to false
             running = false;
         }
         /// <summary>
@@ -492,7 +586,6 @@ namespace LP2_P2
                 // The target is the coordinates of its corner
                 orangeTarget.Pos = new Position(1, 21);
             }
-
             // checks if the old position of the player is not the
             // current position and the the current position of the
             // pink ghost is not it's target
