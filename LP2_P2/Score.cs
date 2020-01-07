@@ -13,7 +13,7 @@ namespace LP2_P2
         // Declare public property TotalScore of type int with a private set,
         // responsible for containing the value of the total score of a player
         public int TotalScore { get; private set; }
-        
+
         /// <summary>
         /// Score class constructor with no parameters, responsible for 
         /// creating an instance of the class with a default string value Name,
@@ -54,7 +54,7 @@ namespace LP2_P2
             // Add score given as a parameter to the TotalScore property
             TotalScore += scoreToAdd;
         }
-        
+
         /// <summary>
         /// Sets the Scores name as the given string
         /// </summary>
@@ -78,7 +78,7 @@ namespace LP2_P2
             // Returns the negative of the int returned from the CompareTo of
             // the TotalScore property of the instance it is called from with
             // the TotalScore from a different instance of Score
-            return - TotalScore.CompareTo(otherScore.TotalScore);
+            return -TotalScore.CompareTo(otherScore.TotalScore);
         }
         /// <summary>
         /// Override of ToString method, which returns a simple string that

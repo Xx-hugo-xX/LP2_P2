@@ -16,9 +16,10 @@ namespace LP2_P2
         /// <param name="y"> The starting Y position </param>
         public Player()
         {
-            // Assgins the Pos from the class it inherits from a new position
+            // Assigns the Pos from the class it inherits from a new position
             Pos = new Position(13, 18);
-            // Assgins the OldPos from the class it inherits from a new position
+            // Assigns the OldPos from the class
+            // it inherits from a new position
             OldPos = new Position(1, 1);
             // Gives it a visual for when it's to be displayed
             Visuals = 'C';

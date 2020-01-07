@@ -272,7 +272,7 @@ namespace LP2_P2
                 // the same Position has the last position of the ghost
                 if (allPieces[c].ObjType != ObjectType.player &&
                     allPieces[c].ObjType != ObjectType.wall &&
-                    !(allPieces[c].Pos == OldPos))
+                    allPieces[c].Pos != OldPos)
                 {
                     // Compares the piece position to the cordinates either
                     // of the four neibghours should be

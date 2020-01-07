@@ -20,7 +20,7 @@ namespace LP2_P2
         private readonly InputSystem inputSys;
         // Creates the thread for the InputSystem variable
         private readonly Thread keyReader;
-        
+
         // Creates a variable of Ghost for all of the 4 ghosts
         private readonly Ghost redGhost;
         private readonly Ghost pinkGhost;
@@ -28,11 +28,11 @@ namespace LP2_P2
         private readonly Ghost blueGhost;
 
         // Creates 3 Targets for the the AI of the different ghosts
-        private readonly DefaultObject pinkTarget = 
+        private readonly DefaultObject pinkTarget =
             new DefaultObject(0, 0, ' ', ObjectType.target);
-        private readonly DefaultObject orangeTarget = 
+        private readonly DefaultObject orangeTarget =
             new DefaultObject(0, 0, ' ', ObjectType.target);
-        private readonly DefaultObject blueTarget = 
+        private readonly DefaultObject blueTarget =
             new DefaultObject(0, 0, ' ', ObjectType.target);
 
         // Int for keeping track of the current level
@@ -191,6 +191,9 @@ namespace LP2_P2
             CheckForCollisions();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Render()
         {
             Console.WriteLine($"{player.plyrScore}\t\tLevel: {level}");
@@ -680,7 +683,7 @@ namespace LP2_P2
             // checks if the old position of the player is not the
             // current position and the the current position of the
             // pink ghost is not it's target
-            if (!(player.OldPos == player.Pos) ||
+            if (player.OldPos != player.Pos ||
                 pinkGhost.Pos == pinkTarget.Pos)
             {
                 // Finds the position the player is moving towards and
@@ -720,7 +723,8 @@ namespace LP2_P2
         // back in his starting position and resets input
         private void CheckForLevelFinish()
         {
-            if (!physicsObjects.Exists(obj => obj.ObjType == ObjectType.pellet))
+            if (!physicsObjects.Exists(obj =>
+            obj.ObjType == ObjectType.pellet))
             {
                 level++;
                 // Clear list of physics objects, to generate the level again

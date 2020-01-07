@@ -30,14 +30,19 @@ namespace LP2_P2
             for (int i = 0; i < colliders.Count; i++)
             {
                 // Checks if the Object being checked is not itself
-                if (colliders[i].ObjType != col.ObjType && colliders[i].ObjType != ObjectType.emptySpace)
+                if (colliders[i].ObjType != col.ObjType &&
+                    colliders[i].ObjType != ObjectType.emptySpace)
                 {
                     // Checks if the next X and Y values are inside any
                     // collider of all the Objects
-                    if (col.BoxCollider[0] + (x) >= colliders[i].BoxCollider[0]
-                        && col.BoxCollider[2] + (x) <= colliders[i].BoxCollider[2] &&
-                        col.BoxCollider[1] + (y) >= colliders[i].BoxCollider[1]
-                        && col.BoxCollider[3] + (y) <= colliders[i].BoxCollider[3])
+                    if (col.BoxCollider[0] + (x) >=
+                        colliders[i].BoxCollider[0] &&
+                        col.BoxCollider[2] + (x) <=
+                        colliders[i].BoxCollider[2] &&
+                        col.BoxCollider[1] + (y) >=
+                        colliders[i].BoxCollider[1] &&
+                        col.BoxCollider[3] + (y) <=
+                        colliders[i].BoxCollider[3])
                     {
                         // If it is inside retruns the type of that Object
                         return colliders[i];
@@ -60,14 +65,15 @@ namespace LP2_P2
             for (int i = 0; i < colliders.Count; i++)
             {
                 // Checks if the Object being checked is not itself
-                if (colliders[i].ObjType != col.ObjType && colliders[i].ObjType != ObjectType.emptySpace)
+                if (colliders[i].ObjType != col.ObjType &&
+                    colliders[i].ObjType != ObjectType.emptySpace)
                 {
                     // Checks if the next X and Y values are inside any
                     // collider of all the Objects
                     if (col.BoxCollider[0] >= colliders[i].BoxCollider[0]
                         && col.BoxCollider[2] <= colliders[i].BoxCollider[2] &&
-                        col.BoxCollider[1]  >= colliders[i].BoxCollider[1]
-                        && col.BoxCollider[3]  <= colliders[i].BoxCollider[3])
+                        col.BoxCollider[1] >= colliders[i].BoxCollider[1]
+                        && col.BoxCollider[3] <= colliders[i].BoxCollider[3])
                     {
                         // If it is inside retruns the type of that Object
                         a.Add(colliders[i]);

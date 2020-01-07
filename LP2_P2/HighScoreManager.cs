@@ -165,10 +165,7 @@ namespace LP2_P2
         {
             // Returns true if the "highScores" list has less
             // Scores than the maximum ammount of Scores allowed
-            if (highScores.Count < maxHS)
-            {
-                return true;
-            }
+            if (highScores.Count < maxHS) return true;
 
             // Checks if the given Scores "TotalScore" is higher
             // than the lowest "TotalScore"
