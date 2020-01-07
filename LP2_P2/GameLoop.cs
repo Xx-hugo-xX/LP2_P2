@@ -144,7 +144,7 @@ namespace LP2_P2
                 // Processes the input
                 inputSys.ProcessInput();
                 // Runs the Update method
-                Update(mapVisuals);
+                Update();
                 if (inputSys.IsRunning)
                 {
                     // Runs the Render method
@@ -167,7 +167,7 @@ namespace LP2_P2
         /// Main method of the game responsible for movement, collision and AI
         /// </summary>
         /// <param name="mapVisuals"> The double array of the map </param>
-        public void Update(char[,] mapVisuals)
+        public void Update()
         {
             // Checks for level finish (all pellets collected) and passes
             // to the next level if the conditions are met, generating the

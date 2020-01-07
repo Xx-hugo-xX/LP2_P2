@@ -27,7 +27,7 @@ namespace LP2_P2
         private readonly int maxHS = 10;
 
         // Declares the list that will store the High Scores
-        private List<Score> highScores;
+        private readonly List<Score> highScores;
 
         public HighScoreManager()
         {
