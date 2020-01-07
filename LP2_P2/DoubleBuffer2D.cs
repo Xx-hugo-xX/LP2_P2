@@ -42,10 +42,13 @@ namespace LP2_P2
             Clear();
         }
 
-        // Swaps the current frame for the next frame
+        /// <summary>
+        /// Swaps the current frame for the next frame
+        /// </summary>
         public void Swap()
         {
-            T[,] auxNext = next;
+            // Sets new auxiliary frame with the value of the next frame
+            T[,] auxNext = current;
             current = next;
             next = auxNext;
         }
