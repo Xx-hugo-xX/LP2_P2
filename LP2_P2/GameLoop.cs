@@ -559,7 +559,7 @@ namespace LP2_P2
                         else if (ghost.state != GhostState.eaten)
                         {
                             // kills the player ending the game
-                            KillPlayer();
+                            player.Death(inputSys, HSManager);
                         }
                     }
                     // Checks if the player is on a Pellet

@@ -130,12 +130,7 @@ namespace LP2_P2
                 // element of the 'nameAndScore' array (score)
                 string score = nameAndScore[1];
 
-<<<<<<< HEAD
-                // Writes the current Scores 'Name' and 'TotalScore'
-                Console.WriteLine($"Player: {name}\tScore: {score}");
-=======
                 Console.WriteLine($"Player: {name}\tScore: {score,4}");
->>>>>>> origin/AI
             }
             // Asks for user input before exiting the method
             Console.ReadKey(true);
