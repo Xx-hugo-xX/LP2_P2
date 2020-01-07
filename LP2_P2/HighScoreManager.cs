@@ -138,7 +138,8 @@ namespace LP2_P2
                 // Tells the user that their score
                 // has been added to the High Scores
                 Console.WriteLine($"Your score of {score.TotalScore} was " +
-                    $"added to the High Scores!");
+                    $"added to the High Scores!\n" +
+                    $"Press any key to continue");
 
                 // Only let's user advance after he presses any key
                 Console.ReadKey(true);
@@ -192,12 +193,13 @@ namespace LP2_P2
             using StreamWriter sw = new StreamWriter(fileNameFull);
 
             // Loops through each element of the "highScores" list
-            foreach (Score hs in highScores)
+            for(int i = 0; i < highScores.Count; i++)
             {
                 // Writes the Names and TotalScores (separated by a 'tab')
                 // of each element of the "highScores" list
                 // on the High Scores file
-                sw.WriteLine(hs.Name + "\t" + hs.TotalScore);
+                sw.WriteLine($"{highScores[i].Name}\t" +
+                    $"{highScores[i].TotalScore}");
             }
         }
 

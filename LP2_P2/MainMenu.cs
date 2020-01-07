@@ -143,11 +143,18 @@ namespace LP2_P2
             // Clears the console
             Console.Clear();
 
-            // Writes evry possible input option for the user (during the game)
+            // Writes every possible input option during the game and explain
+            // how the game progresses to the player
             Console.WriteLine("W - Go up\n" +
                 "A - Go left\n" +
                 "S - Go down\n" +
                 "D - Go right\n\n" +
+                "Collect all the pellets ( . ) to advance to the next " +
+                "level!\nCollect a big pellet ( º ) to become able to eat " +
+                "ghosts\nCollect bonus fruits ( F ) to earn a higher amount " +
+                "of score, increased with every level passed\n" +
+                "Try to get the highest score you can and appear in the " +
+                "highscore list!\n\n" +
                 "Press any key to return to the Main Menu.");
             // Asks for user input before exiting the method
             Console.ReadKey(true);
